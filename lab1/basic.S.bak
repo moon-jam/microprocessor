@@ -1,0 +1,55 @@
+List p=18f4520 
+    #include <pic18f4520.inc>
+    CONFIG OSC = INTIO67
+    CONFIG WDT = OFF
+    org 0x00
+
+start:
+    ; test case 1: 12 08 0A 05
+    test1:
+        MOVLW 0x12
+        MOVWF 0x00, 0          ;[0x00] = 0x12
+        MOVLW 0x08
+        MOVWF 0x01, 0          ;[0x01] = 0x08
+        MOVLW 0x0A
+        MOVWF 0x02, 0          ;[0x02] = 0x0A
+        MOVLW 0x05
+        MOVWF 0x03, 0          ;[0x03] = 0x05
+
+    ; test case 2: 0C 14 18 08
+    test2:
+        ; MOVLW 0x0C
+        ; MOVWF 0x00, 0          ;[0x00] = 0x0C
+        ; MOVLW 0x14
+        ; MOVWF 0x01, 0          ;[0x01] = 0x14
+        ; MOVLW 0x18
+        ; MOVWF 0x02, 0          ;[0x02] = 0x18
+        ; MOVLW 0x08
+        ; MOVWF 0x03, 0          ;[0x03] = 0x08
+
+    MOVF 0x00, 0
+    ADDWF 0x01, 0               ;WREG = [0x00] + [0x01]
+    MOVWF 0x10                  ;[0x10] = WREG
+    MOVF 0x02, 0
+    ADDWF 0x03, 0               ;WREG = [0x02] + [0x03]
+    MOVWF 0x11                  ;[0x11] = WREG
+
+    CPFSGT 0x10                 ;[0x10] > WREG?
+        GOTO equal
+        MOVLW 0x11
+        MOVWF 0x20
+        GOTO finish
+    equal:
+        CPFSEQ 0x10             ;[0x10] == WREG?
+            GOTO less
+            MOVLW 0x22
+            MOVWF 0x20
+            GOTO finish
+    less:
+        MOVLW 0x33
+        MOVWF 0x20
+        GOTO finish
+
+    finish:
+        NOP
+    end

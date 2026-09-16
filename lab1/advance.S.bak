@@ -1,0 +1,40 @@
+List p=18f4520 
+    #include <pic18f4520.inc>
+    CONFIG OSC = INTIO67
+    CONFIG WDT = OFF
+    org 0x00
+
+    test1:
+        ; MOVLW 0b11010010
+        ; MOVWF 0x00, 0          ;[0x00]=0b11010010
+
+    test2:
+        MOVLW 0b10011001
+        MOVWF 0x00, 0          ;[0x00]=0b10011001
+
+    CLRF 0x03
+    CLRF 0x10
+    loop:
+        MOVLW 0x01
+        ANDWF 0x00, 0               ;WREG = [0x00] & 0x01
+        RLNCF 0x10                  ;[0x10] = [0x10] << 1
+        IORWF 0x10, 1               ;[0x10] = [0x10] | WREG
+        RRNCF 0x00                  ;[0x00] = [0x00] >> 1
+        INCF 0x03
+        MOVLW 0x08
+        CPFSLT 0x03             ;[0x03] < 8
+            GOTO check
+            GOTO loop
+
+    check:
+        MOVF 0x00, 0
+        CLRF 0x11
+        CPFSEQ 0x10             ;[0x00] == [0x10]?
+            GOTO finish
+        MOVLW 0xFF
+        MOVWF 0x11
+
+    finish:
+        NOP
+
+    end

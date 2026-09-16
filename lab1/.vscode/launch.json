@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    {
+      // Note: Properties here can override MPLAB project settings
+      "name": "Simulator",
+      "type": "mplab-core-da",
+      "request": "launch",
+      "project": "lab1",
+      "configuration": "default",
+      "program": "${workspaceFolder}/out/lab1/default.elf",
+      "device": "PIC18F4520",
+      "tool": "Simulator",
+      "properties": {
+        "debugoptions.debug-startup": "Halt at reset vector"
+      }
+    }
+  ]
+}
