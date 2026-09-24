@@ -1,0 +1,23 @@
+{
+    "mplab.clangd.compileCommandsDir": "${workspaceFolder}/_build/lab1/default",
+    "memory-inspector.debugTypes": [
+        "arm-debugger",
+        "embedded-debug",
+        "gdb",
+        "gdbtarget",
+        "mplab-core-da"
+    ],
+    "mplab.ioview.columnWidths": {
+        "lab1-default": [
+            153,
+            100,
+            100,
+            100,
+            100,
+            100
+        ]
+    },
+    "mplab.ioview.taggedNodes": {
+        "lab1-default": []
+    }
+}

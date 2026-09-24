@@ -1,0 +1,94 @@
+List p=18f4520 
+    #include <pic18f4520.inc>
+    CONFIG OSC = INTIO67
+    CONFIG WDT = OFF
+    org 0x00
+
+PUTBYTE MACRO value
+    MOVLW value
+    MOVWF POSTINC0, 0
+ENDM
+
+    GOTO test2
+
+test1:
+    LFSR 0, 0x200
+    PUTBYTE 0x01
+    PUTBYTE 0x03
+    PUTBYTE 0x05
+    PUTBYTE 0x07
+    PUTBYTE 0x09
+    PUTBYTE 0x0B
+
+    LFSR 0, 0x210
+    PUTBYTE 0x02
+    PUTBYTE 0x04
+    PUTBYTE 0x06
+    PUTBYTE 0x08
+    PUTBYTE 0x0A
+    GOTO merge_start
+
+test2:
+    LFSR 0, 0x200
+    PUTBYTE 0x05
+    PUTBYTE 0x1A
+    PUTBYTE 0x2C
+    PUTBYTE 0x40
+    PUTBYTE 0x7E
+    PUTBYTE 0xA0
+
+    LFSR 0, 0x210
+    PUTBYTE 0x06
+    PUTBYTE 0x20
+    PUTBYTE 0x33
+    PUTBYTE 0x80
+    PUTBYTE 0xF0
+    GOTO merge_start
+
+merge_start:
+        
+    ; FSR0 = 0x200, FSR1 = 0x210, FSR2 = 0x22A
+    ; for (i = 0, j = 0; i < 6 || j < 5;) {
+    ;   if (i < 5 || (i < 6 && *FSR0 <= *FSR1)) *(FSR2--) = *(FSR0++), i++;  // --cond1
+    ;   else FSR2-- = *(FSR1++), j++; // --cond2
+
+    LFSR 0, 0x200
+    LFSR 1, 0x210
+    LFSR 2, 0x22A
+    CLRF 0x03          ; i = 0
+    CLRF 0x04          ; j = 0
+loop:
+    MOVLW 0x06
+    CPFSLT 0x03
+    GOTO i_GE_6        ; if (i >= 6)
+    GOTO i_LT_6        ; if (i < 6)
+
+i_LT_6:
+    MOVLW 0x05
+    CPFSLT 0x04
+    GOTO cond1         ; if (j >= 5)
+    MOVF INDF1, 0      ; W = *FSR1
+    CPFSGT INDF0
+    GOTO cond1         ; if (*FSR0 <= *FSR1)
+    GOTO cond2         ; if (*FSR0 > *FSR1)
+
+cond1:
+    ; if (j >= 5 && i < 6)
+    MOVFF POSTINC0, POSTDEC2     ; *(FSR2--) = *(FSR0++)
+    INCF 0x03                    ; i++
+    GOTO loop
+
+i_GE_6:
+    MOVLW 0x05
+    CPFSLT 0x04
+    GOTO finish        ; if (j >= 5 && i >= 6)
+    ; if (j < 5 && i >= 6)
+
+cond2:
+    MOVFF POSTINC1, POSTDEC2     ; *(FSR2--) = *(FSR1++)
+    INCF 0x04                    ; j++
+    GOTO loop
+
+finish:
+    NOP
+    end
