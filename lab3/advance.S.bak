@@ -1,0 +1,38 @@
+List p=18f4520 
+    #include <pic18f4520.inc>
+    CONFIG OSC = INTIO67
+    CONFIG WDT = OFF
+    org 0x00
+
+    goto test2
+
+test1:
+    MOVLW 0x00
+    MOVWF 0x00
+    MOVLW 0x64
+    MOVWF 0x01
+    goto start
+
+test2:
+    MOVLW 0xFF
+    MOVWF 0x00
+    MOVLW 0x9C
+    MOVWF 0x01
+    goto start
+
+start:
+    MOVLW 0x80
+    ANDWF 0x00, 0
+    MOVFF 0x00, 0x10
+    MOVFF 0x01, 0x11
+    BZ finish
+    COMF 0x10
+    COMF 0x11
+    MOVLW 0x01
+    ADDWF 0x11
+    BNC finish
+    ADDWF 0x10
+
+finish:
+    NOP
+    end

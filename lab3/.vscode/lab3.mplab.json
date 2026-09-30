@@ -1,0 +1,40 @@
+{
+    "version": "1.9",
+    "configurations": [
+        {
+            "name": "default",
+            "id": "conf1",
+            "device": "PIC18F4520",
+            "imagePath": "./out/lab3/default.elf",
+            "tool": "Simulator",
+            "packs": [
+                {
+                    "name": "PIC18Fxxxx_DFP",
+                    "vendor": "Microchip",
+                    "version": "1.8.178"
+                }
+            ],
+            "fileSet": "default",
+            "toolchain": "default-PIC-AS"
+        }
+    ],
+    "propertyGroups": [
+        {
+            "name": "default-PIC-AS",
+            "type": "toolchain",
+            "provider": "microchip.toolchains:pic-as@4.00",
+            "properties": {}
+        }
+    ],
+    "fileSets": [
+        {
+            "name": "default",
+            "files": [
+                {
+                    "include": "**/*",
+                    "exclude": "**/@(build|_build|out|cmake|.vscode)/**/*"
+                }
+            ]
+        }
+    ]
+}
