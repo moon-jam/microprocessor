@@ -1,0 +1,73 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+goto test2
+
+test1:
+	MOVLW 0x12
+	MOVWF 0x00
+	MOVLW 0x34
+	MOVWF 0x01
+	goto start
+
+test2:
+	MOVLW 0x3C
+	MOVWF 0x00
+	MOVLW 0x7B
+	MOVWF 0x01
+	goto start
+
+division:
+	MOVLW 	0x0F
+	ANDWF	0x01,	W
+	MOVWF	0x20
+	MOVLW 	0xF0
+	ANDWF 	0x01,	F
+
+	RRCF	0x00
+	RRCF	0x01
+	RRCF	0x00
+	RRCF	0x01
+	RRCF	0x00
+	RRCF	0x01
+	RRCF	0x00
+	RRCF	0x01
+	
+	RETURN
+
+start:
+	CLRF	0x10
+	CLRF	0x11
+
+	rcall division
+	MOVF	0x20,	W
+	IORWF	0x10,	F
+	RLNCF	0x10
+	RLNCF	0x10
+	RLNCF	0x10
+	RLNCF	0x10
+
+	rcall division
+	MOVF	0x20,	W
+	IORWF	0x10,	F
+
+
+	rcall division
+	MOVF	0x20,	W
+	IORWF	0x11,	F
+	RLNCF	0x11
+	RLNCF	0x11
+	RLNCF	0x11
+	RLNCF	0x11
+
+	rcall division
+	MOVF	0x20,	W
+	IORWF	0x11,	F
+
+finish:
+	NOP
+
+END

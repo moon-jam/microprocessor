@@ -1,0 +1,82 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+goto test1
+
+test1:						;0x000-0x003: 0xFF, 0x02, 0x80, 0x03
+	MOVLW 0xFF
+	MOVWF 0x00
+	MOVLW 0x02
+	MOVWF 0x01
+	MOVLW 0x80
+	MOVWF 0x02
+	MOVLW 0x03
+	MOVWF 0x03
+	goto start
+
+test2:						;0x000-0x003: 0xDC, 0xA0, 0xB0, 0x30
+	MOVLW 0xDC
+	MOVWF 0x00
+	MOVLW 0xA0
+	MOVWF 0x01
+	MOVLW 0xB0
+	MOVWF 0x02
+	MOVLW 0x30
+	MOVWF 0x03
+	goto start
+
+Mul MACRO s1, s2, d1, d2
+	LOCAL 	s1_NN, s2_NN, end_mul
+	CLRF 	0x05				; negative flag
+	MOVF 	s1,		w
+	BNN 	s1_NN
+	NEGF 	s1
+	MOVLW 	0x01
+	XORWF 	0x05, 	f
+
+s1_NN:
+	MOVF 	s2,		w
+	BNN 	s2_NN
+	NEGF 	s2
+	MOVLW 	0x01
+	XORWF 	0x05, 	f
+
+s2_NN:
+	MOVF 	s1,		W
+	MULWF	s2
+	MOVFF	PRODH,	d1
+	MOVFF	PRODL,	d2
+	MOVF 	0x05, 	w
+	BZ		end_mul
+	COMF	d1,		f
+	COMF	d2,		f
+	INCF	d2,		f
+	BNC		end_mul
+	INCF 	d1,		f
+
+end_mul:
+endm
+
+Mul_Add macro x1, x2, y1, y2
+	Mul x1, x2, 0x10, 0x11
+	Mul y1, y2, 0x12, 0x13
+	MOVF 	0x12, 	w
+	ADDWF	0x10,	f
+	MOVF 	0x13, 	w
+	ADDWF	0x11,	f
+	BNC		end_mul_add
+	INCF	0x10,	f
+
+end_mul_add:
+endm
+
+start:
+	Mul_Add 0x00, 0x01, 0x02, 0x03
+
+finish:
+	NOP
+
+END
