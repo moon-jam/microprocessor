@@ -1,0 +1,30 @@
+{
+	"folders": [
+		{
+			"name": "basic",
+			"path": "basic"
+		},
+		{
+			"name": "advance",
+			"path": "advance"
+		},
+		{
+			"name": "hard",
+			"path": "hard"
+		}
+	],
+	"settings": {
+		"mplab.clangd.compileCommandsDir": "${workspaceFolder}/_build/basic/default",
+		"mplab.clangd.arguments": [
+			"--header-insertion=never"
+		],
+		"mplab.clangd.path": "/Applications/microchip/xc8/v4.00/bin/xc8-clangd",
+		"memory-inspector.debugTypes": [
+			"arm-debugger",
+			"embedded-debug",
+			"gdb",
+			"gdbtarget",
+			"mplab-core-da"
+		]
+	}
+}

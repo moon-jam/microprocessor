@@ -1,0 +1,28 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch advance: default",
+			"type": "mplab-core-da",
+			"request": "launch",
+			"project": "advance",
+			"configuration": "default",
+			"stopOnEntry": true,
+			"preLaunchTask": "advance: default - Build",
+			"program": "${workspaceFolder:advance}/out/advance/default.elf"
+		},
+		{
+			"name": "Program advance: default - Production",
+			"type": "mplab-core-da",
+			"request": "launch",
+			"project": "advance",
+			"configuration": "default",
+			"noDebug": true,
+			"preLaunchTask": "advance: default - Build (Production)",
+			"program": "${workspaceFolder:advance}/out/advance/production/default-production.hex"
+		}
+	]
+}
