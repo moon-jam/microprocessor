@@ -1,0 +1,70 @@
+; 9:53
+; 11:00
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr, B
+endm
+
+	MOVLB 	1
+	GOTO 	test2
+
+test1:
+	ASSIGN	0x00, 0x05
+	ASSIGN	0x20, 0xB2
+	ASSIGN	0x21, 0x6D
+	ASSIGN	0x22, 0x00
+	ASSIGN	0x23, 0xFF
+	ASSIGN	0x24, 0x01
+	GOTO	start
+
+test2:
+	ASSIGN	0x00, 0x05
+	ASSIGN	0x20, 0x3C
+	ASSIGN	0x21, 0x81
+	ASSIGN	0x22, 0x5A
+	ASSIGN	0x23, 0xAA
+	ASSIGN	0x24, 0x00
+	GOTO	start
+
+start:
+	MOVFF	0x100, 0x130
+	LFSR	0, 0x120
+	LFSR	1, 0x140
+	CLRF	0x60, B
+	CLRF	0x61, B
+transform:
+	MOVLW	0b01010101
+	ANDWF	INDF0, W
+	RLNCF	WREG, W
+	MOVWF	INDF1
+	MOVLW	0b10101010
+	ANDWF	INDF0, W
+	RRNCF	WREG, W
+	IORWF	INDF1, F
+	MOVF	INDF1, W
+	CPFSLT	INDF0	; skip if INDF0 < INDF1
+	goto	no_stricly_greater
+	INCF	0x60, F, B
+
+no_stricly_greater:
+	CPFSLT	0x61, B
+	goto	not_max
+	MOVFF	INDF1, 0x161
+
+not_max:
+	MOVF 	POSTINC0, W
+	MOVF 	POSTINC1, W
+	DCFSNZ	0x30, F, B		; guarentee N>=1
+	GOTO	finish
+	GOTO	transform
+
+finish:
+	NOP
+
+END

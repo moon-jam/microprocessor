@@ -1,0 +1,112 @@
+; 11:15
+; 12:00
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr, B
+endm
+
+ACC MACRO xh, xl, y
+	MOVF	y, w, B
+	ADDWF	xl, f, B
+	MOVLW	0x00
+	ADDWFC	xh, f, B
+endm
+
+	MOVLB 	1
+	GOTO 	test1
+
+#define x 0x1B0
+#define y 0x1B1
+gcd8:
+	; do
+	; x < y => swap x, y
+	; if y == 0 break
+	; x = x - y
+	; while true
+GCD_LOOP:
+	MOVF	x, w, B
+	CPFSGT	y, B	; skip if y > x
+	GOTO	NO_SWAP
+	MOVFF	y, x
+	MOVWF	y, B
+	
+NO_SWAP:	; x >= y
+	MOVF	y, w, B
+	BZ		GCD_DONE
+
+	MOVF	y, w, B
+	SUBWF	x, f, B
+
+	GOTO	GCD_LOOP
+
+GCD_DONE:
+	RETURN
+
+test1:
+	ASSIGN	0x01, 0x05
+	ASSIGN	0x80, 0x05
+	ASSIGN	0x81, 0xFC
+	ASSIGN	0x82, 0x11
+	ASSIGN	0x83, 0x28
+	ASSIGN	0x84, 0xFF
+	ASSIGN	0xA0, 0x0A
+	ASSIGN	0xA1, 0x69
+	ASSIGN	0xA2, 0x05
+	ASSIGN	0xA3, 0x12
+	ASSIGN	0xA4, 0xFF
+	GOTO	start
+
+test2:
+	ASSIGN	0x01, 0x05
+	ASSIGN	0x80, 0x0C
+	ASSIGN	0x81, 0x25
+	ASSIGN	0x82, 0xFF
+	ASSIGN	0x83, 0x80
+	ASSIGN	0x84, 0x07
+	ASSIGN	0xA0, 0x12
+	ASSIGN	0xA1, 0x15
+	ASSIGN	0xA2, 0x11
+	ASSIGN	0xA3, 0x40
+	ASSIGN	0xA4, 0x05
+	GOTO	start
+
+start:
+	CLRF	0x1E0
+	CLRF	0x1E1
+	CLRF	0x1E2
+	LFSR	0, 0x180
+	LFSR	1, 0x1A0
+	LFSR	2, 0x1C0
+	MOVFF	0x101, 0x1D0
+
+loop:
+	MOVFF	INDF0, 0x1B0
+	MOVFF	INDF1, 0x1B1
+	CALL	gcd8		
+	MOVFF	0x1B0, INDF2
+	MOVLW	0x01
+	CPFSEQ	0xB0, B	; skip if gcd(x,y)=1
+	GOTO	not_coprime
+	INCF	0xE2, B
+
+not_coprime:
+	BCF     STATUS, 0
+	ACC		0xE0, 0xE1, 0xB0
+
+	MOVF 	POSTINC0, W
+	MOVF 	POSTINC1, W
+	MOVF 	POSTINC2, W
+	DCFSNZ	0xD0, F, B		; guarentee N>=1
+	GOTO	finish
+	GOTO	loop
+
+finish:
+	NOP
+
+END

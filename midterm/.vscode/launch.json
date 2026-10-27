@@ -1,0 +1,32 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Note: Properties here can override MPLAB project settings
+      "name": "Launch midterm: default",
+      "type": "mplab-core-da",
+      "request": "launch",
+      "project": "midterm",
+      "configuration": "default",
+      "preLaunchTask": "midterm: default - Build",
+      "program": "${workspaceFolder:midterm}/out/midterm/default.elf",
+		"properties": {
+		  "debugoptions.debug-startup": "Halt at reset vector"
+		}
+    },
+    {
+      // Note: Properties here can override MPLAB project settings
+      "name": "Program midterm: default - Production",
+      "type": "mplab-core-da",
+      "request": "launch",
+      "project": "midterm",
+      "configuration": "default",
+      "noDebug": true,
+      "preLaunchTask": "midterm: default - Build (Production)",
+      "program": "${workspaceFolder:midterm}/out/midterm/production/default-production.hex"
+    }
+  ]
+}

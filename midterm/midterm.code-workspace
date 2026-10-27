@@ -1,0 +1,42 @@
+{
+	"folders": [
+		{
+			"name": "midterm",
+			"path": "."
+		},
+		{
+			"name": "lab5",
+			"path": "../lab5"
+		},
+		{
+			"name": "lab4",
+			"path": "../lab4"
+		},
+		{
+			"name": "lab3",
+			"path": "../lab3"
+		},
+		{
+			"name": "lab2",
+			"path": "../lab2"
+		},
+		{
+			"name": "lab1",
+			"path": "../lab1"
+		},
+		{
+			"name": "lab_description",
+			"path": "../lab_description"
+		}
+	],
+	"settings": {
+		"mplab.clangd.compileCommandsDir": "${userHome}/Project/college/microprocessor/lab4/_build/lab4/default",
+		"memory-inspector.debugTypes": [
+			"arm-debugger",
+			"embedded-debug",
+			"gdb",
+			"gdbtarget",
+			"mplab-core-da"
+		]
+	}
+}

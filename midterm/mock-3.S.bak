@@ -1,0 +1,131 @@
+; 1:20
+; 2:05
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr
+endm
+
+	GOTO 	test1
+
+test1:
+	ASSIGN	0x00, 0x00
+	ASSIGN	0x01, 0x02
+	ASSIGN	0x02, 0x00
+	ASSIGN	0x03, 0x00
+	ASSIGN	0x04, 0x03
+	ASSIGN	0x05, 0x02
+	ASSIGN	0x06, 0x00
+	ASSIGN	0x07, 0x04
+	GOTO	start
+
+test2:
+	ASSIGN	0x00, 0x01
+	ASSIGN	0x01, 0x00
+	ASSIGN	0x02, 0x01
+	ASSIGN	0x03, 0x00
+	ASSIGN	0x04, 0x10
+	ASSIGN	0x05, 0x02
+	ASSIGN	0x06, 0x00
+	ASSIGN	0x07, 0x03
+	GOTO	start
+
+
+#define xh 0x20
+#define xl 0x21
+#define yh 0x22
+#define yl 0x23
+#define zh 0x24
+#define zl 0x25
+#define op 0x26
+mul16: 	; (0x20:0x21, 0x22:0x23) -> 0x24:0x25
+	MOVF	xl, w
+	MULWF	yl
+	MOVFF	PRODL, zl
+	MOVFF	PRODH, zh
+
+	; MOVF	xl, w
+	MULWF	yh
+	MOVF	PRODL, w
+	ADDWF	zh
+
+	MOVF	yl, w
+	MULWF	xh
+	MOVF	PRODL, w
+	ADDWF	zh
+
+	RETURN
+
+add16:
+	MOVF	xl, w
+	ADDWF	yl, w
+	MOVWF	zl
+	MOVF	xh, w
+	ADDWFC	yh, w
+	MOVWF	zh
+
+	RETURN
+
+sub16:
+	MOVF	yl, w
+	SUBWF	xl, w
+	MOVWF	zl
+	MOVF	yh, w
+	SUBWFB	xh, w
+	MOVWF	zh
+
+	RETURN
+	
+cal:	; xh:xl, op, yh:yl -> zh:zl
+	BTFSC	op, 0
+	GOTO	sub16	; op = 0b00000001
+	BTFSC	op, 1
+	GOTO	mul16
+	GOTO	add16	; op = 0b00000000
+
+start:
+	MOVF	0x05, w
+	SUBLW	0x02
+	BZ		_231
+	MOVFF	0x000, xh
+	MOVFF	0x001, xl
+	MOVFF	0x002, op
+	MOVFF	0x003, yh
+	MOVFF	0x004, yl
+	CALL	cal
+
+	MOVFF	zh, xh
+	MOVFF	zl, xl
+	MOVFF	0x005, op
+	MOVFF	0x006, yh
+	MOVFF	0x007, yl
+	CALL	cal
+	GOTO	finish
+
+_231:
+	MOVFF	0x003, xh
+	MOVFF	0x004, xl
+	MOVFF	0x005, op
+	MOVFF	0x006, yh
+	MOVFF	0x007, yl
+	CALL	cal
+
+	MOVFF	0x000, xh
+	MOVFF	0x001, xl
+	MOVFF	0x002, op
+	MOVFF	zh, yh
+	MOVFF	zl, yl
+	CALL	cal
+	GOTO	finish
+
+finish:
+	MOVFF	zh, 0x010
+	MOVFF	zl, 0x011
+	NOP
+
+END

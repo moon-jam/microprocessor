@@ -1,0 +1,25 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr
+endm
+
+	GOTO 	test2
+
+test1:
+	GOTO	start
+
+test2:
+	GOTO	start
+
+start:
+
+finish:
+	NOP
+
+END

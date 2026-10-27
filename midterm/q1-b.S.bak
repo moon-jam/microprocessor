@@ -1,0 +1,50 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr
+endm
+
+TRIANGULAR MACRO n, result
+	local TRI_loop, TRI_finish
+	MOVFF	n, 0x020
+	CLRF	result
+	MOVLW	1
+
+TRI_loop:
+	ADDWF	result, f
+	INCF	WREG
+	DCFSNZ	0x020, F, B		; guarentee N>=1
+	GOTO	TRI_finish
+	GOTO	TRI_loop
+
+TRI_finish:
+endm
+
+	GOTO 	test1
+
+test1:
+	ASSIGN	0x000, 0x02
+	ASSIGN	0x001, 0x09
+	ASSIGN	0x002, 0x0F
+	GOTO	start
+
+test2:
+	ASSIGN	0x000, 0x07
+	ASSIGN	0x001, 0x0A
+	ASSIGN	0x002, 0x16
+	GOTO	start
+
+start:
+	TRIANGULAR 0x000, 0x010
+	TRIANGULAR 0x001, 0x011
+	TRIANGULAR 0x002, 0x012
+
+finish:
+	NOP
+
+END

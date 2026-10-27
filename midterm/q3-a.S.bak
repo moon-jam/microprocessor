@@ -1,0 +1,79 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr
+endm
+
+	GOTO 	test1
+
+test1:
+	ASSIGN	0x00, 0x10
+	ASSIGN	0x01, 0x00
+	ASSIGN	0x02, 0x00
+	ASSIGN	0x03, 0x01
+	GOTO	start
+
+test2:
+	ASSIGN	0x00, 0x85
+	ASSIGN	0x01, 0x20
+	ASSIGN	0x02, 0x32
+	ASSIGN	0x03, 0x15
+	GOTO	start
+
+start:
+	MOVF	0x03, w
+	SUBWF	0x01, w
+	MOVWF	0x11
+	MOVF	0x02, w
+	SUBWFB	0x00, w
+	MOVWF	0x10
+	
+	MOVLW	0b00001111
+	ANDWF	0x11, w
+	MOVWF	0x20
+	MOVLW	0b00001111
+	ANDWF	0x00, w
+	CPFSGT	0x20	; skip if after sub, greater
+	GOTO	low_low_done
+	GOTO	low_low_sub_6
+
+low_low_sub_6:
+	MOVLW	0x06
+	SUBWF	0x11, f
+
+low_low_done:
+	MOVLW	0b11110000
+	ANDWF	0x11, w
+	MOVWF	0x20
+	MOVLW	0b11110000
+	ANDWF	0x00, w
+	CPFSGT	0x20	; skip if after sub, greater
+	GOTO	low_high_done
+	GOTO	low_high_sub_6
+low_high_sub_6:
+	MOVLW	0x60
+	SUBWF	0x11, f
+
+low_high_done:
+	MOVLW	0b00001111
+	ANDWF	0x10, w
+	MOVWF	0x20
+	MOVLW	0b00001111
+	ANDWF	0x00, w
+	CPFSGT	0x20	; skip if after sub, greater
+	GOTO	finish
+	GOTO	high_low_sub_6
+
+high_low_sub_6:
+	MOVLW	0x06
+	SUBWF	0x10, f
+
+finish:
+	NOP
+
+END

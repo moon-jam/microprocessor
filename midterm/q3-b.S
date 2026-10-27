@@ -1,0 +1,71 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr
+endm
+
+	GOTO 	test2
+
+test1:
+	GOTO	start
+
+test2:
+	ASSIGN	0x00, 0x00
+	GOTO	start
+
+#define CRCHH 0x10
+#define CRCHL 0x11
+#define CRCLH 0x12
+#define CRCLL 0x13
+
+start:
+	MOVLW	8
+	MOVWF	0x20
+
+loop:
+	MOVLW	0x00
+	MOVWF	CRCHH
+	MOVWF	CRCHL
+	MOVWF	CRCLH
+	MOVLW	0xFF
+	XORWF	0x00
+	MOVWF	CRCLL
+
+	BCF   	STATUS,0
+	RRCF	CRCHH
+	RRCF	CRCHL
+	RRCF	CRCLH
+	RRCF	CRCLL
+
+	BTFSS	CRCLL, 0 ; skip if bit 0 = 1
+	GOTO	loop
+	MOVF	CRCHH,w
+	XORLW	0xED
+	MOVWF	CRCHH
+
+	MOVF	CRCHL,w
+	XORLW	0xB8
+	MOVWF	CRCHL
+
+	MOVF	CRCLH,w
+	XORLW	0x83
+	MOVWF	CRCLH
+
+	MOVF	CRCLL,w
+	XORLW	0x20
+	MOVWF	CRCLL
+
+	DCFSNZ	0x020, F		; guarentee N>=1
+	GOTO	finish
+	GOTO	loop
+
+
+finish:
+	NOP
+
+END

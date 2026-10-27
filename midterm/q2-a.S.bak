@@ -1,0 +1,59 @@
+List p=18f4520 
+#include <pic18f4520.inc>
+CONFIG OSC = INTIO67
+CONFIG WDT = OFF
+org 0x00
+
+ASSIGN MACRO addr, literal
+	MOVLW	literal
+	MOVWF	addr
+endm
+
+	GOTO 	test1
+
+test1:
+	ASSIGN	0x00, 0x01
+	ASSIGN	0x01, 0x03
+	ASSIGN	0x02, 0x05
+	ASSIGN	0x03, 0x07
+	ASSIGN	0x04, 0x09
+	ASSIGN	0x05, 0x0A
+	GOTO	start
+
+test2:
+	ASSIGN	0x00, 0x01
+	ASSIGN	0x01, 0x03
+	ASSIGN	0x02, 0x05
+	ASSIGN	0x03, 0x07
+	ASSIGN	0x04, 0x09
+	ASSIGN	0x05, 0x0B
+	GOTO	start
+
+start:
+	LFSR	0, 0x00
+	LFSR	1, 0x10
+	LFSR	2, 0x20
+	CLRF	0x30
+	CLRF	0x31
+
+	MOVLW	6
+
+loop:
+	; 0
+	BTFSC	INDF0, 0	; skip if bit 0 clear (even)
+	INCF	0x31
+	BTFSS	INDF0, 0	; skip if bit 0 set (odd)
+	INCF	0x30
+	BTFSC	INDF0, 0	; skip if bit 0 clear (even)
+	MOVFF	POSTINC0, POSTINC2
+	BTFSS	INDF0, 0	; skip if bit 0 set (odd)
+	MOVFF	POSTINC0, POSTINC1
+
+	DCFSNZ	WREG
+	GOTO	finish
+	GOTO	loop
+
+finish:
+		NOP
+
+END
