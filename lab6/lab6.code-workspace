@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"name": "template",
+			"path": "template"
+		},
+		{
+			"name": "basic",
+			"path": "basic"
+		},
+		{
+			"name": "advance",
+			"path": "advance"
+		},
+		{
+			"name": "hard",
+			"path": "hard"
+		}
+	],
+	"settings": {
+		"mplab.clangd.compileCommandsDir": "${workspaceFolder}/_build/template/default"
+	}
+}
