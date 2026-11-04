@@ -1,0 +1,25 @@
+{
+	"folders": [
+		{
+			"path": "basic"
+		},
+		{
+			"name": "advance",
+			"path": "advance"
+		},
+		{
+			"name": "hard",
+			"path": "hard"
+		}
+	],
+	"settings": {
+		"memory-inspector.debugTypes": [
+			"arm-debugger",
+			"embedded-debug",
+			"gdb",
+			"gdbtarget",
+			"mplab-core-da"
+		],
+		"mplab.clangd.compileCommandsDir": "${workspaceFolder}/_build/basic/default"
+	}
+}
