@@ -406,13 +406,6 @@ static inline bool analogRead(Pin pin, uint16_t *result) {
     return true;
 }
 
-/* Maps 0..1023 to 0..(sections-1), including the 1023 endpoint. */
-static inline uint8_t analogBucket(uint16_t raw, uint8_t sections) {
-    if (!sections) return 0U;
-    if (raw > 1023U) raw = 1023U;
-    return (uint8_t)(((uint32_t)raw * sections) / 1024UL);
-}
-
 static inline uint16_t analogMillivolts(uint16_t raw, uint16_t vref_mv) {
     if (raw > 1023U) raw = 1023U;
     return (uint16_t)(((uint32_t)raw * vref_mv + 511UL) / 1023UL);
