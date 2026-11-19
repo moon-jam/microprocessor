@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "basic"
+		},
+		{
+			"name": "advance",
+			"path": "advance"
+		},
+		{
+			"name": "hard",
+			"path": "hard"
+		}
+	],
+	"settings": {
+		"mplab.clangd.compileCommandsDir": "${userHome}/Project/college/microprocessor/lab8/advance/_build/advance/default",
+		"mplab.clangd.arguments": [
+			"--header-insertion=never"
+		],
+		"mplab.clangd.path": "/Applications/microchip/xc8/v4.00/bin/xc8-clangd"
+	}
+}

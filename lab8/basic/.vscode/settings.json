@@ -1,0 +1,7 @@
+{
+	"mplab.clangd.compileCommandsDir": "${workspaceFolder}/_build/basic/default",
+	"mplab.clangd.arguments": [
+		"--header-insertion=never"
+	],
+	"mplab.clangd.path": "/Applications/microchip/xc8/v4.00/bin/xc8-clangd"
+}
