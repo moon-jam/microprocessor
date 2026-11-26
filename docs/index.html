@@ -1,0 +1,1563 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PIC18F4520 HAL 使用手冊，包含晶片組態、接線、API Reference、中斷、計時器，以及 Lab 6～10 的 C 範例。">
+  <title lang="en">PIC18F4520 HAL Guide</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="assets/prism/prism-c-1.30.0.min.js"></script>
+  <script defer src="site.js"></script>
+  <script defer src="reader.js"></script>
+</head>
+<body>
+  <header>
+    <a class="repo-corner" href="https://github.com/moon-jam/microprocessor" aria-label="GitHub 儲存庫">
+      <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path fill="#38312c" d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/>
+        <path class="octo-arm" fill="#fff" d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"/>
+        <path fill="#fff" d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"/>
+      </svg>
+    </a>
+    <div class="bar">
+      <a class="brand" href="#top">PIC18F4520 HAL</a>
+      <a href="#config">pic18f4520_config.h</a>
+      <div class="bar-actions">
+        <a href="../lib/pic18f4520_hal.h">pic18f4520_hal.h</a>
+        <button id="open-find" type="button" aria-controls="page-find" aria-expanded="false" hidden>搜尋 <kbd>/</kbd></button>
+        <button id="open-shortcuts" type="button" aria-haspopup="dialog" hidden>快捷鍵</button>
+      </div>
+    </div>
+    <form class="page-find" id="page-find" role="search" aria-label="搜尋手冊" hidden>
+      <input id="find-input" type="search" aria-label="搜尋手冊" placeholder="搜尋手冊" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <output id="find-status" aria-live="polite"></output>
+      <button id="find-previous" type="button" aria-label="上一筆搜尋結果" title="上一筆搜尋結果">↑</button>
+      <button type="submit" aria-label="下一筆搜尋結果" title="下一筆搜尋結果">↓</button>
+      <button id="close-find" type="button" aria-label="關閉搜尋" title="關閉搜尋">×</button>
+    </form>
+  </header>
+
+  <dialog id="shortcuts" aria-labelledby="shortcuts-title">
+    <h2 id="shortcuts-title" lang="en">Vim Shortcuts</h2>
+    <dl class="shortcut-list">
+      <dt><kbd>/</kbd></dt><dd>搜尋手冊</dd>
+      <dt><kbd>Enter</kbd> / <kbd>Shift+Enter</kbd></dt><dd>搜尋時切換下一筆／上一筆</dd>
+      <dt><kbd>n</kbd> / <kbd>N</kbd></dt><dd>下一筆／上一筆搜尋結果</dd>
+      <dt><kbd>j</kbd> / <kbd>k</kbd></dt><dd>向下／向上捲動</dd>
+      <dt><kbd>Ctrl+D</kbd> / <kbd>Ctrl+U</kbd></dt><dd>向下／向上捲半頁</dd>
+      <dt><kbd>gg</kbd> / <kbd>G</kbd></dt><dd>跳到頁首／頁尾</dd>
+      <dt><kbd>Ctrl+O</kbd> / <kbd>Ctrl+I</kbd></dt><dd>回上一個／下一個跳轉位置</dd>
+      <dt><kbd>?</kbd></dt><dd>開啟這張清單</dd>
+      <dt><kbd>Esc</kbd></dt><dd>關閉搜尋或快捷鍵清單</dd>
+    </dl>
+    <form method="dialog" class="shortcut-actions">
+      <label><input id="enable-vim" type="checkbox" checked> 啟用 Vim 快捷鍵</label>
+      <button autofocus>關閉</button>
+    </form>
+  </dialog>
+
+  <div class="layout" id="top">
+    <div class="sidebar">
+      <nav id="contents" aria-label="Contents" lang="en">
+        <div class="nav-group">
+          <div class="nav-row"><a href="#start">Getting Started</a></div>
+          <div class="subnav" id="nav-start">
+            <a href="#config">Chip Configuration (pic18f4520_config.h)</a>
+            <a href="#makefile">Build / Flash / Monitor</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <div class="nav-row"><a href="#wiring">Pins / Wiring</a></div>
+          <div class="subnav" id="nav-wiring"><a href="#pickit">Programming with PICkit 3</a></div>
+        </div>
+        <a href="#api">API Reference</a>
+        <a href="#gpio">Digital Pins / Buttons</a>
+        <div class="nav-group">
+          <div class="nav-row"><a href="#analog">Analog Input / Pulse Output / Servos</a></div>
+          <div class="subnav" id="nav-analog">
+            <a href="#adc">Reading a Voltage</a>
+            <a href="#pwm">Generating a Periodic Waveform</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <div class="nav-row"><a href="#uart">UART</a></div>
+          <div class="subnav" id="nav-uart">
+            <a href="#uart-printf">Formatted Output with printf</a>
+            <a href="#uart-scanf">Formatted Input with scanf</a>
+          </div>
+        </div>
+        <a href="#terminal-output">Terminal Output</a>
+        <div class="nav-group">
+          <div class="nav-row"><a href="#interrupts">Interrupts</a></div>
+          <div class="subnav" id="nav-interrupts">
+            <a href="#interrupt-settings">Interrupt Settings</a>
+            <a href="#interrupt-nesting">Interrupts During an ISR</a>
+            <a href="#interrupt-handling">Handling Pending Events</a>
+            <a href="#interrupt-example">Button / UART Receive / Timer3</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <div class="nav-row"><a href="#timers">Hardware Timers</a></div>
+          <div class="subnav" id="nav-timers">
+            <a href="#timer-uses">What Timers Do</a>
+            <a href="#timer-example">Periodic Interrupt Example</a>
+            <a href="#timer0">Timer0</a>
+            <a href="#timer1">Timer1</a>
+            <a href="#timer2">Timer2</a>
+            <a href="#timer3">Timer3</a>
+          </div>
+        </div>
+        <a href="#sources">References</a>
+        <div class="nav-group">
+          <div class="nav-row"><a href="#examples">Examples (Labs 6–10)</a></div>
+          <div class="subnav" id="nav-examples">
+            <a href="#lab6">Lab 6 (Digital Pins)</a>
+            <a href="#lab7">Lab 7 (Interrupts / Timers)</a>
+            <a href="#lab8">Lab 8 (Servo Control)</a>
+            <a href="#lab9">Lab 9 (Analog Input)</a>
+            <a href="#lab10">Lab 10 (UART)</a>
+          </div>
+        </div>
+        <a href="#macos-screen">Using screen on macOS</a>
+      </nav>
+      <div class="nav-resize" role="separator" aria-label="調整側欄寬度" aria-orientation="vertical" aria-controls="contents" tabindex="0" hidden></div>
+    </div>
+
+    <main>
+      <h1 id="guide" lang="en"><a class="heading-link" href="#guide">PIC18F4520 HAL Guide</a></h1>
+      <p class="intro">硬體抽象層（Hardware Abstraction Layer，HAL）把常用的腳位、計時和通訊操作包成 C 函式。遇到接線、多個周邊共用計時器，或要直接設定中斷時，仍要看晶片對應的硬體功能。</p>
+
+      <section>
+        <h2 id="start" lang="en"><a class="heading-link" href="#start">Getting Started</a></h2>
+        <p>在 MPLAB 專案選擇 PIC18F4520 和 MPLAB XC8 C 編譯器。每個韌體專案只在一個 <code>.c</code> 檔引入下列兩個標頭檔。設定檔提供晶片的組態位元，函式庫用 <code>putch()</code> 和 <code>getch()</code> 把 C 標準輸出與輸入接到序列埠。</p>
+        <p>使用 Visual Studio Code 編輯時，建議安裝 <a href="https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools">Microsoft 的 C/C++ 擴充套件</a>。開啟工作區設定，搜尋 <code>C_Cpp.errorSquiggles</code> 並設為 <code>disabled</code>。</p>
+        <p id="include-path">來源檔位於儲存庫根目錄下兩層時（如 <code>dir/subdir/app.c</code>），使用 <code>../../lib/</code>。深度不同時，調整 <code>#include</code> 中的 <code>../</code> 層數。</p>
+        <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+void main(void) {
+    halBegin();
+    pinMode(PIN_RD0, OUTPUT);
+
+    while (1) {
+        digitalToggle(PIN_RD0);
+        delayMs(500);
+    }
+}</code></pre>
+        <p>把發光二極體（Light-Emitting Diode，LED）接到 <code>RD0</code>，就會每約 0.5 秒切換亮滅。<code>halBegin()</code> 會切換到內部振盪器、把多功能腳位預設設為數位、啟用高低中斷優先權模式，並啟動 Timer1。</p>
+        <p>預設振盪頻率 <code>HAL_FOSC_HZ</code> 為 500,000 Hz。要修改，在引入 HAL 前用 <code>#define HAL_FOSC_HZ 1000000UL</code> 之類的設定。支援 125、250、500 kHz，以及 1、2、4、8 MHz。變更後要重新確認通訊速率和脈波頻率。</p>
+
+        <h3 id="config" lang="en"><a class="heading-link" href="#config">Chip Configuration (pic18f4520_config.h)</a></h3>
+        <p>編譯器用 <code>#pragma config</code> 寫入晶片啟動時讀取的組態位元。<code>OSC = INTIO67</code> 選內部振盪器。<code>WDT = OFF</code> 關閉看門狗計時器（Watchdog Timer），<code>LVP = OFF</code> 關閉低電壓燒錄（Low-Voltage Programming）。<code>PBADEN = OFF</code> 讓 B 埠共用類比功能的腳位在重設時預設為數位。<code>CCP2MX = PORTC</code> 把第二組捕捉、比較與脈波寬度調變模組（Capture/Compare/PWM，CCP）接到 <code>RC1</code>。</p>
+        <pre><code class="language-c">#ifndef PIC18F4520_CONFIG_H
+#define PIC18F4520_CONFIG_H
+
+#pragma config OSC = INTIO67
+#pragma config WDT = OFF
+#pragma config LVP = OFF
+#pragma config PBADEN = OFF
+#pragma config CCP2MX = PORTC
+
+#endif</code></pre>
+        <p><a href="../lib/pic18f4520_config.h" download>下載 pic18f4520_config.h</a></p>
+
+        <h3 id="makefile" lang="en"><a class="heading-link" href="#makefile">Build / Flash / Monitor</a></h3>
+        <p>在儲存庫根目錄執行 <code>make new</code>（需要 Python 3.9 以上），輸入專案目錄並逐層確認建立。產生的 <code>main.c</code> 和 <code>makefile</code> 會依目錄深度設定 <code>lib/</code> 的路徑。</p>
+        <p>將 Makefile 放在 <code>main.c</code> 同層。若工具安裝路徑不同，調整 <code>XC8</code>、<code>DFP</code> 和 <code>IPE_DIR</code>。</p>
+        <details class="example-code">
+          <summary>完整 Makefile</summary>
+          <pre><code class="makefile"><span class="token macro-name">SHELL</span> := /bin/bash
+
+XC8 ?= /Applications/microchip/xc8/v4.00/bin/xc8-cc
+<span class="token macro-name">DFP</span> ?= $(HOME)/.mchp_packs/Microchip/PIC18Fxxxx_DFP/1.8.178/xc8
+<span class="token macro-name">IPE_DIR</span> ?= /Applications/microchip/mplabx/v6.20/mplab_platform/mplab_ipe
+<span class="token macro-name">IPECMD</span> ?= $(IPE_DIR)/bin/ipecmd.sh
+<span class="token macro-name">BOOST_PORT</span> ?= 2012
+<span class="token macro-name">SCREEN</span> ?= /usr/bin/screen
+<span class="token macro-name">BAUD</span> ?= 9600
+<span class="token macro-name">TARGET_POWER</span> ?= -W5.0
+
+<span class="token macro-name">DEVICE</span> := 18F4520
+
+.PHONY: connect disconnect flash monitor clean
+.DELETE_ON_ERROR:
+<span class="token keyword">export</span> HEX PORT BAUD TARGET_POWER
+
+<span class="token function">out/main.hex</span>: main.c ../../lib/pic18f4520_config.h \
+              ../../lib/pic18f4520_hal.h
+	mkdir -p out/.xc8
+	cd out/.xc8 &amp;&amp; "$(XC8)" -mcpu=$(DEVICE) "-mdfp=$(DFP)" -O1 "$(abspath $&lt;)" -o main.elf
+	mv out/.xc8/main.hex "$@"
+
+<span class="token function">clean</span>:
+	rm -rf out/.xc8 out/main.hex
+
+<span class="token keyword">define</span> terminal_command
+fail() { printf '%s\n' "$$*" &gt;&amp;2; return 1; }
+
+tty_mode= tmp=
+restore() {
+    [[ -z "$$tmp" ]] || rm -r "$$tmp"
+    [[ -z "$$tty_mode" ]] || stty "$$tty_mode"
+}
+trap restore EXIT
+if [[ -t 0 &amp;&amp; -t 2 ]]; then
+    tty_mode=$$(stty -g)
+    stty opost onlcr
+fi
+
+choose() {
+    local missing="$$1" prompt="$$2" PS3=': ' COLUMNS=1
+    shift 2
+    case $$# in
+        0) fail "$$missing" ;;
+        1) selected=$$1 ;;
+        *) printf '%s\n' "$$prompt" &gt;&amp;2
+           select selected; do [[ -n "$$selected" ]] &amp;&amp; return 0; done
+           return 1 ;;
+    esac
+}
+
+if [[ "$$0" == monitor ]]; then
+    selected="$${PORT:-}"
+    if [[ -z "$$selected" ]]; then
+        shopt -s nullglob
+        choose 'No USB serial ports found. Set PORT to select one explicitly.' 'Select a serial port' \
+            /dev/cu.usbserial* /dev/cu.usbmodem* /dev/cu.wchusbserial* /dev/cu.SLAB_USBtoUART*
+    fi
+    [[ -c "$$selected" ]] || fail "Serial port not found: $$selected"
+    "$(SCREEN)" "$$selected" "$$BAUD"
+    exit 0
+fi
+
+port="$(BOOST_PORT)"
+ipe=$$(cd "$(IPE_DIR)" &amp;&amp; pwd -P)
+state="$$HOME/.mchp_ipe/pic18f4520-$$port.session"
+marker="$$HOME/.mchp_ipe/$$port.ini"
+power="$$TARGET_POWER"
+
+[[ "$$port" =~ ^[1-9][0-9]{0,4}$$ ]] &amp;&amp; (( port &lt;= 65535 )) || fail "Invalid Boost port: $$port"
+
+valid_power() { [[ -z "$$1" || "$$1" =~ ^-W([0-9]+(\.[0-9]+)?)?$$ ]]; }
+valid_power "$$power" || fail 'Set TARGET_POWER to a voltage option such as -W5.0, or leave it empty for external power.'
+
+listener() { lsof -wanPt -iTCP:"$$port" -sTCP:LISTEN || :; }
+
+is_boost() {
+    [[ "$$1" =~ ^[0-9]+$$ &amp;&amp; -e "$$marker" ]] &amp;&amp;
+        [[ "$$(ps -ww -p "$$1" -o command=)" == *" -jar $$ipe/ipecmd.jar" ]]
+}
+
+boost() (
+    . "$$ipe/jdkloc" &amp;&amp; cd "$$ipe" || exit 1
+    export PATH="$$ipe/../bin:$$PATH"
+    exec /usr/bin/sandbox-exec -p '(version 1) (allow default) (deny network-inbound (remote ip "*:*")) (allow network-inbound (remote ip "localhost:*"))' \
+        "$$jdkhome/bin/java" -jar ipecmdboost.jar "-OY$$port" "$$@"
+)
+
+check_ipe() {
+    printf 'If MPLAB IPE is connected, click Disconnect or close MPLAB IPE, then try again.\n' &gt;&amp;2
+}
+
+disconnect_session() {
+    [[ "$$(listener)" == "$$1" ]] &amp;&amp; is_boost "$$1" || { fail 'The Boost session changed. Try again.'; return 1; }
+    boost -OQ || :
+    for ((attempt = 0; attempt &lt; 20; ++attempt)); do
+        if [[ "$$(listener)" != "$$1" &amp;&amp; ! -e "$$marker" ]]; then
+            rm -f -- "$$state"
+            return 0
+        fi
+        sleep 0.1
+    done
+    fail "Boost did not disconnect from port $$port."
+}
+
+connect_session() {
+    [[ -z "$$(listener)" &amp;&amp; ! -e "$$marker" ]] ||
+        { fail "Boost port $$port is in use or has stale state. Choose another BOOST_PORT."; return 1; }
+    if ! boost -P$(DEVICE) -TPPK3 $${power:+"$$power"} -OK -OL; then
+        local failed_pid=$$(listener)
+        if is_boost "$$failed_pid"; then disconnect_session "$$failed_pid" || :; fi
+        check_ipe
+        return 1
+    fi
+    active=$$(listener)
+    is_boost "$$active" || { fail "Could not identify the new Boost session on port $$port."; return 1; }
+    if ! { printf '%s %s\n' "$$active" "$$power" &gt; "$$state.tmp" &amp;&amp;
+        mv -- "$$state.tmp" "$$state"; }; then
+        rm -f -- "$$state.tmp"
+        disconnect_session "$$active" || :
+        return 1
+    fi
+    printf 'Boost session ready on port %s (%s).\n' "$$port" "$${power:-external power}"
+}
+
+active=
+if [[ -r "$$state" ]] &amp;&amp; read -r saved_pid saved_power &lt; "$$state" &amp;&amp;
+    [[ "$$(listener)" == "$$saved_pid" ]] &amp;&amp; is_boost "$$saved_pid" &amp;&amp; valid_power "$$saved_power"; then
+    active=$$saved_pid
+fi
+
+case "$$0" in
+    connect)
+        if [[ -n "$$active" ]]; then
+            printf 'Boost session already active on port %s (%s).\n' "$$port" "$${saved_power:-external power}"
+        else
+            connect_session
+        fi
+        ;;
+    disconnect)
+        if [[ -z "$$active" ]]; then
+            printf 'No managed Boost session on port %s.\n' "$$port"
+            exit 0
+        fi
+        printf 'Disconnect Boost on port %s? Target power may stop. [y/N]\n: ' "$$port" &gt;&amp;2
+        read -r answer || { printf '\nCancelled.\n' &gt;&amp;2; exit 0; }
+        case "$$answer" in
+            y|Y|yes|YES) disconnect_session "$$active" ;;
+            *) printf 'Cancelled.\n' ;;
+        esac
+        ;;
+    flash)
+        selected="$${HEX:-}"
+        if [[ -z "$$selected" ]]; then
+            items=()
+            while IFS= read -r file; do items+=("$$file"); done \
+                &lt; &lt;(find . -path './out/.xc8' -prune -o -type f -iname '*.hex' -print | LC_ALL=C sort)
+            choose 'No .hex files found. Run make first.' 'Select a .hex file to flash' "$${items[@]}"
+        fi
+        tmp=$$(mktemp -d /tmp/pic18-flash.XXXXXX)
+        cp -- "$$selected" "$$tmp/firmware.hex"
+        program="$(IPECMD)"
+        if [[ -n "$$active" ]]; then
+            $(if $(filter command environment,$(origin TARGET_POWER)),:,power=$$saved_power)
+            reuse="Reuse session ($${saved_power:-external power})"
+            reconnect="Disconnect and reconnect ($${power:-external power})"
+            items=("$$reconnect" "Cancel")
+            if [[ "$$power" == "$$saved_power" ]]; then
+                items=("$$reuse" "$${items[@]}")
+            fi
+            choose 'No session action available.' "Boost is active on port $$port. Select a flash action" "$${items[@]}"
+            case "$$selected" in
+                "$$reuse") ;;
+                "$$reconnect") disconnect_session "$$active"; connect_session ;;
+                *) printf 'Cancelled.\n'; exit 0 ;;
+            esac
+            [[ "$$(listener)" == "$$active" ]] &amp;&amp; is_boost "$$active" || fail 'The Boost session changed. Try again.'
+            program=boost
+        else
+            printf 'Tip: Run make connect before repeated flashes to reuse Boost and reduce startup time.\n'
+        fi
+        if ! "$$program" -P$(DEVICE) -TPPK3 $${power:+"$$power"} "-F$$tmp/firmware.hex" -M -Y -OL; then
+            check_ipe
+            exit 1
+        fi
+        ;;
+esac
+<span class="token keyword">endef</span>
+
+<span class="token keyword">export</span> terminal_command
+<span class="token function">connect disconnect flash</span>:
+	@umask 077; mkdir -p "$$HOME/.mchp_ipe" &amp;&amp; \
+	    lockf -kt 0 "$$HOME/.mchp_ipe/pic18f4520.lock" "$(SHELL)" -ec "$$terminal_command" "$@"
+
+<span class="token function">monitor</span>:
+	@"$(SHELL)" -ec "$$terminal_command" "$@"</code></pre>
+        </details>
+        <ul>
+          <li><code>make</code> 編譯成 <code>out/main.hex</code>。</li>
+          <li><code>make clean</code> 清除這份 Makefile 的編譯產物。</li>
+          <li><code>make flash</code> 選擇 <code>.hex</code> 後單次燒錄。有 Boost 工作階段時，可沿用、斷線重連或取消。可用 <code>HEX=out/main.hex</code> 指定檔案。</li>
+          <li><code>make connect</code> 啟動 IPECMDBoost。這是 Microchip 的背景燒錄程序，後續燒錄可重用已啟動的程序，並沿用這次的供電設定。<a href="#target-power">目標板供電</a></li>
+          <li><code>make disconnect</code> 確認後關閉 Boost 工作階段。若由 PICkit 3 供電，板子可能失電。</li>
+          <li><code>make monitor</code> 選擇序列埠並開啟 <code>screen</code>，可用 <code>PORT</code> 和 <code>BAUD</code> 指定裝置與鮑率。<a href="#macos-screen">screen 的操作方式</a></li>
+        </ul>
+        <p>MPLAB IPE 已連上 PICkit 3 時，先在視窗按 <strong>Disconnect</strong>，再用命令列燒錄。改用外部電源時，可先斷開舊工作階段，再執行 <code>make connect TARGET_POWER=</code>。Boost 工作階段仍在時，板子的供電仍須另外確認。</p>
+      </section>
+
+      <section>
+        <h2 id="wiring" lang="en"><a class="heading-link" href="#wiring">Pins / Wiring</a></h2>
+        <p>以缺口朝上看 40 腳雙列直插封裝。左上是第 1 腳，右上是第 40 腳。程式裡的 <code>PIN_RB0</code> 表示 B 埠第 0 位，對應封裝第 33 腳。同一腳旁的斜線表示不同硬體功能可共用那個腳位。</p>
+        <figure>
+          <a href="assets/pic18f4520-pinout.png" aria-label="開啟完整的 PIC18F4520 腳位圖"><img src="assets/pic18f4520-pinout.png" width="1150" height="696" loading="lazy" alt="PIC18F4420 與 PIC18F4520 的 40 腳封裝圖，缺口朝上，左側為第 1 至 20 腳，右側為第 21 至 40 腳。"></a>
+          <figcaption>PIC18F4520 腳位。依實際封裝核對腳位。<a href="https://ww1.microchip.com/downloads/en/devicedoc/39631e.pdf#page=4">Microchip 資料表的封裝圖</a></figcaption>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="範例接線表">
+          <table>
+            <thead><tr><th scope="col">用途</th><th scope="col">晶片腳位</th><th scope="col">怎麼接</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">電源與地</th><td><code>VDD</code> 11、32；<code>VSS</code> 12、31</td><td>兩個電源腳都接電源，兩個地腳都接地。各電源腳附近加 100 nF 去耦電容。</td></tr>
+              <tr><th scope="row">整合範例的按鈕</th><td><code>RB0</code> 33</td><td>按鈕接地，另用 10 kΩ 電阻把腳位拉到 <code>VDD</code>。放開為高，按下為低。</td></tr>
+              <tr><th scope="row">整合範例的 LED</th><td><code>RD0</code> 19、<code>RA1</code> 3</td><td>每顆 LED 都要串限流電阻。用腳位輸出高點亮時，將 LED 陰極接地。</td></tr>
+              <tr><th scope="row">序列收發</th><td><code>RC6</code> 25、<code>RC7</code> 26</td><td><code>RC6/TX</code>（Transmit，送出）接轉接器 <code>RX</code>（Receive，接收），<code>RC7/RX</code> 接轉接器 <code>TX</code>，兩邊共地。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>序列轉接器的邏輯電壓需和目標板相容。若為不同電壓，先確認兩個方向的輸入容許範圍，必要時加電平轉換。這裡用的是邏輯電平序列埠，直接接帶正負電壓的 RS-232（Recommended Standard 232）會超出晶片腳位規格。</p>
+
+        <h3 id="pickit" lang="en"><a class="heading-link" href="#pickit">Programming with PICkit 3</a></h3>
+        <p>板上序列燒錄（In-Circuit Serial Programming，ICSP）讓燒錄器直接向板上的晶片寫入程式。從 PICkit 3 三角記號找第 1 腳，再接到下列腳位。序列通訊的 <code>RC6</code>、<code>RC7</code> 有自己的接線。</p>
+        <figure>
+          <a href="assets/pickit3-pinout.png" aria-label="開啟完整的 PICkit 3 接頭圖"><img src="assets/pickit3-pinout.png" width="816" height="540" loading="lazy" alt="PICkit 3 燒錄接頭。三角記號指向第 1 腳，接頭依序為 MCLR/VPP、VDD、VSS、PGD、PGC、PGM。"></a>
+          <figcaption>PICkit 3 接頭。<a href="https://www.microchip.com/content/dam/mchp/documents/OTH/ProductDocuments/UserGuides/51795B.pdf#page=15">Microchip 圖 1-2</a></figcaption>
+        </figure>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="PICkit 3 燒錄接線表">
+          <table>
+            <thead><tr><th scope="col">PICkit 3</th><th scope="col">PIC18F4520</th><th scope="col">用途</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">1 <code>MCLR/VPP</code></th><td>1 <code>MCLR/VPP</code></td><td>主清除（Master Clear）與燒錄電壓。目標板用約 10 kΩ 電阻將此腳拉到 <code>VDD</code>，讓晶片平時執行。</td></tr>
+              <tr><th scope="row">2 <code>VDD</code></th><td>11、32 <code>VDD</code></td><td>感測目標板電壓。目標板已外接供電時，關閉 PICkit 3 的目標供電設定。</td></tr>
+              <tr><th scope="row">3 <code>VSS</code></th><td>12、31 <code>VSS</code></td><td>共地。</td></tr>
+              <tr><th scope="row">4 <code>PGD</code></th><td>40 <code>RB7/PGD</code></td><td>燒錄資料（Programming Data）。</td></tr>
+              <tr><th scope="row">5 <code>PGC</code></th><td>39 <code>RB6/PGC</code></td><td>燒錄時脈（Programming Clock）。</td></tr>
+              <tr><th scope="row">6 <code>PGM</code></th><td>此設定留空</td><td>低電壓燒錄（Low-Voltage Programming，LVP）用腳位。<code>pic18f4520_config.h</code> 設為 <code>LVP = OFF</code>。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4 id="target-power" lang="en"><a class="heading-link" href="#target-power">Target Power</a></h4>
+        <p>目標板的 <code>VDD</code> 一次只接一個供電來源。即使兩個電源都標示 5 V，實際電壓也可能略有差異，電流可能從電壓較高的一端流回另一端，造成供電不穩、過熱或損壞。<a href="https://www.ti.com/lit/an/slvae57b/slvae57b.pdf">Texas Instruments 的電源隔離說明</a></p>
+        <ul>
+          <li><strong>PICkit 3 供電。</strong>使用 <code>make flash</code> 的預設設定，拔掉板子的外部電源。USB 轉序列埠轉接器接收發和地，供電腳留空。PICkit 3 的供電上限是 30 mA，伺服馬達使用獨立電源並共地。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/52116A.pdf#page=22">PICkit 3 使用手冊 §2.5.4</a></li>
+          <li><strong>目標板自行供電。</strong>用 <code>make flash TARGET_POWER=</code> 關閉 PICkit 3 的供電。保留 PICkit 3 的 <code>VDD</code> 和 <code>VSS</code> 接線，讓它感測目標板電壓。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/52116A.pdf#page=22">PICkit 3 使用手冊 §2.5.3</a></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 id="api" lang="en"><a class="heading-link" href="#api">API Reference</a></h2>
+        <p>這份應用程式介面（Application Programming Interface，API）參考表列出 HAL 函式的參數、回傳值與使用限制。需要直接操控腳位時用數位輸出入（General-Purpose Input/Output，GPIO）。讀取電壓用類比數位轉換器（Analog-to-Digital Converter，ADC）。要輸出有固定週期的脈波，用脈波寬度調變（Pulse-Width Modulation，PWM）。<a href="../lib/pic18f4520_hal.h">查看標頭檔的文件註解</a></p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="HAL 函式表">
+          <table class="api">
+            <thead><tr><th scope="col">函式</th><th scope="col">參數、結果與限制</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>halBegin()</code></th><td>在 <code>main()</code> 開頭呼叫一次。<a href="#start">初始化</a></td></tr>
+              <tr><th scope="row"><code>pinMode(pin, mode)</code></th><td><code>INPUT</code> 或 <code>OUTPUT</code>。不支援的腳位，以及 <code>PIN_RA5</code> 設為輸出，都回傳 <code>false</code>。</td></tr>
+              <tr><th scope="row"><code>digitalRead(pin)</code></th><td>讀腳位電平。高為 <code>true</code>，低或無效腳位為 <code>false</code>。</td></tr>
+              <tr><th scope="row"><code>digitalWrite(pin, level)</code><br><code>digitalToggle(pin)</code></th><td>把輸出值設成 <code>HIGH</code>、<code>LOW</code>，或反轉輸出值。先設為 <code>OUTPUT</code>。無效腳位回傳 <code>false</code>。</td></tr>
+              <tr><th scope="row"><code>digitalWriteBits(pins, count, bits)</code></th><td>最多寫入 16 腳，最低位寫到 <code>pins[0]</code>。先將陣列裡要寫的腳位設為輸出。</td></tr>
+              <tr><th scope="row"><code>portbPullups(enabled)</code></th><td><code>true</code> 開啟 B 埠數位輸入的內部弱上拉，<code>false</code> 關閉。</td></tr>
+              <tr><th scope="row"><code>buttonBegin(&amp;button, pin, active_high, debounce_ms)</code></th><td>初始化 <code>Button</code>。按下讀到高用 <code>true</code>，按下讀到低用 <code>false</code>。最後一個參數是消除接點彈跳所需的穩定時間，單位是毫秒。</td></tr>
+              <tr><th scope="row"><code>buttonPressed(&amp;button)</code><br><code>buttonReleased(&amp;button)</code><br><code>buttonHeld(&amp;button)</code></th><td>前兩個各消耗一次按下或放開事件。<code>buttonHeld()</code> 回傳目前是否按住。呼叫任一查詢都會更新狀態，也可用 <code>buttonUpdate(&amp;button)</code> 單獨更新。<a href="#gpio">按鈕範例</a></td></tr>
+              <tr><th scope="row"><code>timerNow()</code><br><code>timerTicks(ms, steps)</code><br><code>delayMs(ms)</code></th><td>讀 16 位元的 Timer1 計數、將 <code>ms / steps</code> 毫秒換算成計數格數、等待指定毫秒。換算超出 16 位元或 <code>steps</code> 為零時回傳 0。<a href="#timer1">Timer1 的回繞</a></td></tr>
+              <tr><th scope="row"><code>analogChannel(pin)</code><br><code>analogBegin(highest_pin)</code></th><td>查腳位對應的類比通道，無對應時回傳 <code>-1</code>。<code>analogBegin()</code> 開啟 AN0 到指定腳位的通道，無對應時回傳 <code>false</code>。</td></tr>
+              <tr><th scope="row"><code>analogRead(pin, &amp;raw)</code><br><code>analogMillivolts(raw, vref_mv)</code></th><td>等待轉換完成並寫入 0～1023 的讀值。腳位沒啟用或指標為空時回傳 <code>false</code>。用 <code>analogMillivolts()</code> 按提供的參考電壓換算成毫伏。</td></tr>
+              <tr><th scope="row"><code>pwmBegin(pin, frequency_hz)</code></th><td>啟用 <code>PIN_RC2</code> 或 <code>PIN_RC1</code> 的脈波輸出。頻率無法設定、會改變另一個已啟用輸出的週期，或 Timer2 中斷已啟用時回傳 <code>false</code>。</td></tr>
+              <tr><th scope="row"><code>pwmWriteDuty(pin, duty_0_to_1023)</code><br><code>pwmWriteMicros(pin, high_us)</code></th><td>以 0～1023 的比例值或以微秒設定脈波高電平時間。兩者都要先啟用輸出。比例值超出範圍時回傳 <code>false</code>，時間值超出硬體範圍時會截到可寫上限。</td></tr>
+              <tr><th scope="row"><code>servoAttach(&amp;servo, pin, min_angle, max_angle, min_us, max_us)</code><br><code>servoWrite(&amp;servo, angle)</code></th><td>設定 <code>Servo</code> 的角度與實測脈寬範圍，以 50 Hz 啟動並移到最小角度。更新時，角度會限制在設定範圍。兩者都應檢查回傳值。<a href="#analog">脈寬與校正</a></td></tr>
+              <tr><th scope="row"><code>uartBegin(baud)</code><br><code>uartWrite(byte)</code><br><code>uartPrint(text)</code><br><code>uartRead(&amp;byte)</code></th><td>設定速率、送單一位元組、送字串、嘗試讀一個位元組。<code>uartBegin()</code> 及 <code>uartRead()</code> 需要檢查回傳值。XC8 的 <code>printf()</code> 經由 <code>putch()</code> 將字元送到序列埠。<a href="#uart">序列通訊範例</a></td></tr>
+              <tr><th scope="row"><code>pinAttachInterrupt(pin, edge, priority)</code><br><code>pinInterruptFired(pin)</code></th><td>設定 <code>RB0</code>、<code>RB1</code>、<code>RB2</code> 的外部中斷。<code>RB0</code> 固定為高優先權。<code>edge</code> 為 <code>FALLING</code> 或 <code>RISING</code>。<code>pinInterruptFired()</code> 檢查並清除該腳位的旗標。</td></tr>
+              <tr><th scope="row"><code>uartAttachInterrupt(priority)</code></th><td>啟用接收中斷。先呼叫成功的 <code>uartBegin()</code>，在對應的中斷函式呼叫 <code>uartRead()</code>。</td></tr>
+              <tr><th scope="row"><code>timerAttachInterrupt(timer, period_ms, priority)</code><br><code>timerInterruptFired(timer)</code></th><td>用 <code>TIMER0</code>～<code>TIMER3</code> 指定計時器。週期單位是毫秒。無法設定或遇到 Timer2 資源衝突時回傳 <code>false</code>。中斷函式傳入同一個計時器，檢查並清除該來源的旗標。</td></tr>
+              <tr><th scope="row"><code>halEnableInterrupts(priority)</code></th><td>開啟高優先權的總開關。若傳入 <code>PRIORITY_LOW</code>，也開啟低優先權。三個 <code>*AttachInterrupt()</code> 會自行呼叫。</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section>
+        <h2 id="gpio" lang="en"><a class="heading-link" href="#gpio">Digital Pins / Buttons</a></h2>
+        <p><code>TRISx</code> 決定方向，位元為 1 時是輸入、為 0 時是輸出。HAL 經由 <code>LATx</code> 寫入或切換輸出暫存值，並從 <code>PORTx</code> 讀取腳位當下的電平。設定方向和寫入電平是兩個操作。</p>
+        <p>機械按鈕按下一瞬間可能連續跳動。若只要每按一次切換 LED，主迴圈持續查詢 <code>Button</code> 即可。<code>false</code> 表示按下時腳位被拉低，<code>20</code> 表示狀態要穩定 20 毫秒。</p>
+        <pre><code class="language-c">Button button;
+
+pinMode(PIN_RD0, OUTPUT);
+portbPullups(true);
+buttonBegin(&amp;button, PIN_RB0, false, 20);
+
+while (1) {
+    if (buttonPressed(&amp;button)) {
+        digitalToggle(PIN_RD0);
+    }
+}</code></pre>
+        <p>按鈕放開時沒有驅動 <code>RB0</code>，此時內部電阻會把腳位維持在高電平，這叫弱上拉。按下時腳位接地。若照 <a href="#wiring">接線表</a> 已接外部上拉，就能省略 <code>portbPullups(true)</code>。</p>
+      </section>
+
+      <section>
+        <h2 id="analog" lang="en"><a class="heading-link" href="#analog">Analog Input / Pulse Output / Servos</a></h2>
+        <h3 id="adc" lang="en"><a class="heading-link" href="#adc">Reading a Voltage</a></h3>
+        <p>ADC 用 10 位元表示輸入電壓，範圍是 0～1023。此 HAL 用 <code>VSS</code> 與 <code>VDD</code> 當作參考。<code>analogBegin(PIN_RA1)</code> 會把 <code>RA0/AN0</code> 和 <code>RA1/AN1</code> 一起切成類比模式。這顆晶片透過 <code>ADCON1</code> 成組設定通道，接線前要檢查組內還有哪些腳位正在作數位輸入或輸出。</p>
+        <pre><code class="language-c">uint16_t raw;
+uint16_t millivolts;
+
+if (analogBegin(PIN_RA1) &amp;&amp; analogRead(PIN_RA1, &amp;raw)) {
+    millivolts = analogMillivolts(raw, 5000);
+}</code></pre>
+        <p>上例假設參考電壓為 5,000 毫伏。要換算板子的實際電壓，填實測的 <code>VDD</code>。</p>
+        <h3 id="pwm" lang="en"><a class="heading-link" href="#pwm">Generating a Periodic Waveform</a></h3>
+        <p>PWM 用固定週期重複輸出高低電平。高電平時間佔週期的比例稱為工作週期。晶片用捕捉、比較與脈波寬度調變模組（Capture/Compare/PWM，CCP）輸出，<code>RC2</code> 是 <code>CCP1</code>，<code>pic18f4520_config.h</code> 將 <code>CCP2</code> 設在 <code>RC1</code>。兩個通道可各自調整高電平時間，但共用 Timer2 的週期。</p>
+        <pre><code class="language-c">if (pwmBegin(PIN_RC2, 1000)) {
+    pwmWriteDuty(PIN_RC2, 512);
+}</code></pre>
+        <p>上例要求 1 kHz、約一半時間輸出高電平。伺服馬達通常依高電平持續時間決定位置。以下數值只是示例，請按馬達規格和實測結果設定兩端脈寬，再把訊號腳和馬達電源依規格接妥，並與晶片共地。</p>
+        <pre><code class="language-c">Servo servo;
+
+if (servoAttach(&amp;servo, PIN_RC2, 0, 180, 1000, 2000)) {
+    servoWrite(&amp;servo, 90);
+}</code></pre>
+        <p>若專案一定要用 50 Hz，可在編譯時用 <code>HAL_SERVO_50HZ_SUPPORTED</code> 檢查目前設定。預設 500 kHz 可用。伺服馬達啟用後，其他 HAL 脈波輸出也要與它共用 Timer2 週期。</p>
+      </section>
+
+      <section>
+        <h2 id="uart" lang="en"><a class="heading-link" href="#uart">UART</a></h2>
+        <p>收發雙方各自用本地時脈，約定每一位的時間後，依序送出資料位元。這種通訊由通用非同步收發器（Universal Asynchronous Receiver/Transmitter，UART）處理。PIC18F4520 的硬體模組另支援同步模式，資料表稱為增強型通用同步與非同步收發器（Enhanced Universal Synchronous Asynchronous Receiver Transmitter，EUSART）。</p>
+        <p>接好 <code>RC6/TX</code> 與 <code>RC7/RX</code> 後，在序列終端機設定 <strong>9600、8N1</strong>。每秒 9600 個符號，此處每個符號表示一位元。每筆資料有 8 個資料位元、無同位檢查、1 個停止位元。關閉本機回顯後，畫面上的字元就是晶片實際送回的資料。<a href="#macos-screen">在 macOS 用 screen 連線</a></p>
+        <pre><code class="language-c">uint8_t byte;
+
+if (!uartBegin(9600)) {
+    for (;;) { }
+}
+
+uartPrint("ready\r\n");
+while (1) {
+    if (uartRead(&amp;byte)) {
+        uartWrite(byte);
+    }
+}</code></pre>
+        <p><code>uartBegin()</code> 會設定時脈除數，速率為零、除數超出硬體範圍，或算出的誤差超過 3% 時會回傳 <code>false</code>。以預設 500 kHz 為例，9600 可用，19200 會被拒絕。<code>uartWrite()</code> 會等送出暫存器有空位，<code>uartPrint()</code> 逐個字元呼叫它。</p>
+        <p><code>uartRead()</code> 有資料才回傳 <code>true</code>。硬體最多暫存兩個接收到的位元組。當接收端來不及讀，下一筆資料可能遺失。HAL 偵測到接收溢位（overrun）會重啟接收，讓後續資料能進來。</p>
+
+        <h3 id="uart-printf" lang="en"><a class="heading-link" href="#uart-printf">Formatted Output with printf</a></h3>
+        <p>MPLAB XC8 的 <code>printf()</code> 先把數值依格式轉成文字，再對每個字元呼叫 <code>putch()</code>。<code>pic18f4520_hal.h</code> 已提供下面的定義，將字元交給 <code>uartWrite()</code> 送出。每個韌體只保留一份 <code>putch()</code> 定義。<a href="https://ww1.microchip.com/downloads/en/Appnotes/Getting-Started-with-UART-Using-EUSART-on-PIC18-90003282A.pdf#page=13">Microchip TB3282 第 3.3.4 節</a></p>
+        <pre><code class="language-c">void putch(char c) { uartWrite((uint8_t)c); }</code></pre>
+        <p>接 <code>RC6/TX</code> 到轉接器的 <code>RX</code> 並共地。先開啟設為 <strong>9600、8N1</strong> 的序列終端機，再重設晶片。以下程式在 UART 初始化成功後印出一行。</p>
+        <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+#include &lt;stdio.h&gt;
+
+void main(void) {
+    halBegin();
+
+    if (uartBegin(9600)) {
+        unsigned value = 42;
+        printf("value=%u, hex=0x%04X\r\n", value, value);
+    }
+
+    for (;;) { NOP(); }
+}</code></pre>
+        <p>終端機會顯示 <code>value=42, hex=0x002A</code>。<code>%u</code> 印出無號十進位，<code>%04X</code> 印出大寫十六進位，少於四位時在左邊補零。要清除或重寫一行，見 <a href="#terminal-output" lang="en">Terminal Output</a>。</p>
+
+        <h3 id="uart-scanf" lang="en"><a class="heading-link" href="#uart-scanf">Formatted Input with scanf</a></h3>
+        <p><code>scanf()</code> 是 C 標準輸入函式。XC8 透過 <code>getch()</code> 取得下一個字元，<code>pic18f4520_hal.h</code> 提供的 <code>getch()</code> 會等到 <code>uartRead()</code> 讀到資料。先初始化序列埠，再從主程式呼叫 <code>scanf()</code>，避免與接收中斷同時取資料。只想等一個字元時，也可以用 <code>getchar()</code>。<a href="https://onlinedocs.microchip.com/oxy/GUID-07E1F2AB-C1A0-411C-966F-8738802C42B9-en-US-4/GUID-8C86D437-8B0E-4EB3-A769-CAA4A3D6C7BE.html">Microchip 的 scanf 說明</a></p>
+        <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+#include &lt;stdio.h&gt;
+
+void main(void) {
+    halBegin();
+
+    if (uartBegin(9600)) {
+        int value;
+        uartPrint("Enter an integer: ");
+        if (scanf("%d", &amp;value) == 1) {
+            printf("\r\nvalue=%d\r\n", value);
+        } else {
+            uartPrint("\r\nInvalid input\r\n");
+        }
+    }
+
+    for (;;) { NOP(); }
+}</code></pre>
+        <p>在 <code>screen</code> 輸入 <code>42</code>，按 <kbd>Enter</kbd> 後會看到 <code>value=42</code>。數字後的 <code>\r</code> 就足以結束這次轉換。<code>scanf()</code> 回傳成功讀入的項目數，這裡應為 <code>1</code>。按鍵回顯和退格編輯由終端機或應用程式處理。</p>
+      </section>
+
+      <section>
+        <h2 id="terminal-output" lang="en"><a class="heading-link" href="#terminal-output">Terminal Output</a></h2>
+        <p>C 字串用反斜線表示跳脫序列。<code>\r</code> 讓游標回到行首，<code>\n</code> 在 <code>screen</code> 中往下一行，連用 <code>\r\n</code> 就從下一行行首開始。<code>\b</code> 往左移一格，<code>\t</code> 跳到下一個定位點。<code>\\</code> 和 <code>\"</code> 分別輸出反斜線與雙引號。</p>
+        <p><code>\033</code> 在 C 字串裡代表 Escape（ESC，數值 <code>0x1B</code>）。<code>screen</code> 會把 ESC 開頭的這些位元組組合解讀為畫面操作。<a href="https://ecma-international.org/wp-content/uploads/ECMA-48_5th_edition_june_1991.pdf">ECMA-48 控制序列規格</a></p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="終端機輸出控制">
+          <table>
+            <thead><tr><th scope="col">C 字串</th><th scope="col">效果</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>"\033[2K"</code></th><td>清空整行，游標留在原位。</td></tr>
+              <tr><th scope="row"><code>"\033[K"</code></th><td>從游標所在位置清到行尾。</td></tr>
+              <tr><th scope="row"><code>"\033[A"</code></th><td>往上一行，維持原欄位。接上 <code>\r</code> 就回到上一行行首。</td></tr>
+              <tr><th scope="row"><code>"\b \b"</code></th><td>往左一格，用空白覆蓋，再把游標移回該格。適合擦掉同一行前一個單欄字元，例如數字。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>更新同一行時，先用 <code>\r</code> 回行首，再清除整行。這樣把 <code>count=100</code> 改成 <code>count=9</code> 時，尾端的 <code>00</code> 也會消失。</p>
+        <pre><code class="language-c">printf("count=100");
+printf("\r\033[2Kcount=9");</code></pre>
+      </section>
+
+      <section>
+        <h2 id="interrupts" lang="en"><a class="heading-link" href="#interrupts">Interrupts</a></h2>
+        <p>中斷讓晶片遇到事件時暫停原本的程式，先執行中斷服務常式（Interrupt Service Routine，ISR），再回到原處。HAL 可設定三類中斷來源。</p>
+        <ul>
+          <li><strong>外部腳位。</strong><code>RB0</code>、<code>RB1</code> 或 <code>RB2</code> 的電平變化，例如按下按鈕。用 <code>pinAttachInterrupt()</code>。</li>
+          <li><strong>UART 接收。</strong>收到一個位元組，例如電腦送來一個字元。用 <code>uartAttachInterrupt()</code>。</li>
+          <li><strong>硬體計時器。</strong>經過設定的週期，例如每 500 毫秒切換一次燈號。用 <code>timerAttachInterrupt()</code>。</li>
+        </ul>
+
+        <h3 id="interrupt-settings" lang="en"><a class="heading-link" href="#interrupt-settings">Interrupt Settings</a></h3>
+        <p>事件一發生，硬體就會設中斷旗標（Interrupt Flag，<code>IF</code>）。即使中斷關著，旗標仍可能被設好。來源啟用位元（Interrupt Enable，<code>IE</code>）與對應的總開關都開啟時，晶片才會受理該事件。優先權位元（Interrupt Priority，<code>IP</code>）決定走哪個入口。</p>
+        <ul>
+          <li><code>halBegin()</code> 透過 <code>RCONbits.IPEN</code> 開啟優先權模式。高優先權走 <code>0x08</code>，低優先權走 <code>0x18</code>。舊程式若將 <code>IPEN</code> 設成 0，就會使用相容模式，所有來源共用 <code>0x08</code>，總開關改用 <code>GIE</code> 和周邊中斷開關 <code>PEIE</code>。</li>
+          <li>掛上來源時，函式庫會開啟高優先權總開關 <code>GIEH</code>。若指定低優先權，也會開啟 <code>GIEL</code>。先初始化周邊與共用資料，再呼叫 <code>*AttachInterrupt()</code>。若已經有待處理的事件，例如序列接收暫存區已有資料，開啟後可以立刻進入中斷函式。</li>
+          <li><code>RB0/INT0</code> 固定高優先權，<code>RB1/INT1</code> 或 <code>RB2/INT2</code> 可選高低。腳位電平由高轉低用 <code>FALLING</code>，由低轉高用 <code>RISING</code>。按鈕接地且有上拉電阻時，按下就是 <code>FALLING</code>。</li>
+        </ul>
+        <p>若常漏掉事件，也要核對序列埠的鮑率和計時器的週期。它們決定事件來得多快，<code>HAL_FOSC_HZ</code> 則影響晶片在兩次事件間能執行多少指令。</p>
+
+        <h3 id="interrupt-nesting" lang="en"><a class="heading-link" href="#interrupt-nesting">Interrupts During an ISR</a></h3>
+        <p>下表假設來源與總開關都已啟用。進入低優先權 ISR 時，硬體暫停受理低優先權。進入高優先權 ISR 時，兩級都暫停受理。中斷返回指令（Return from Interrupt，<code>RETFIE</code>）會恢復進入時關掉的開關，回到原來的位置。用 XC8 的 <code>__interrupt(high_priority)</code> 或 <code>__interrupt(low_priority)</code> 宣告對應的函式，編譯器會產生返回指令。把啟用中斷的設定留在主程式，避免在 ISR 裡重新開啟同一級，導致它尚未執行完就再次進入。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="執行中收到中斷時的處理順序">
+          <table>
+            <thead><tr><th scope="col">目前執行</th><th scope="col">高優先權事件</th><th scope="col">低優先權事件</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">主程式</th><td>進入高優先權 ISR。</td><td>進入低優先權 ISR。兩級同時待處理時，高優先權先執行。</td></tr>
+              <tr><th scope="row">低優先權 ISR</th><td>先暫停低優先權 ISR，執行高優先權 ISR，再回到打斷的位置。</td><td>繼續執行目前的 ISR，等它檢查旗標或返回後再受理。</td></tr>
+              <tr><th scope="row">高優先權 ISR</th><td>繼續執行目前的 ISR，等它檢查旗標或返回後再受理。</td><td>等高優先權 ISR 返回，且低優先權可受理時再執行。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>例如低優先權的 Timer3 正在處理，這時 <code>RB0</code> 出現下降沿，晶片會先跑高優先權的按鈕 ISR，再接著處理 Timer3。若兩個來源屬於同一級，它們共用一個 ISR。各來源各寫一個 <code>if</code>，兩個旗標都設好時就能在同一次進入中處理。<a href="https://ww1.microchip.com/downloads/en/DeviceDoc/39631E.pdf#page=93">Microchip 資料表第 9 章</a></p>
+
+        <h3 id="interrupt-handling" lang="en"><a class="heading-link" href="#interrupt-handling">Handling Pending Events</a></h3>
+        <p>選優先權時，先看事件最多能等多久。閃燈晚幾毫秒通常可以接受，連續接收的資料可能在這段時間塞滿暫存區。ISR 只做需要立即完成的事，把格式化輸出、延遲和按鈕去彈跳留在主迴圈。</p>
+        <ul>
+          <li><strong>外部腳位。</strong>用 <code>pinInterruptFired()</code> 確認並清旗標，記下有事件再返回。按鈕接點可能在一次按下中反覆跳動，讓主迴圈去彈跳。旗標只有一位，清除前發生的多次變化可能合成一次。</li>
+          <li><strong>計時器。</strong>用 <code>timerInterruptFired(timer)</code> 清旗標。Timer0、Timer1、Timer3 也會重載計數，晚處理會拉長週期。Timer2 由硬體開始下一輪，但旗標只記錄至少發生一次，延後太久仍可能漏算幾次中斷。<a href="#timers">計時器設定</a></li>
+          <li><strong>序列接收。</strong>用 <code>uartRead()</code> 取資料，交給主迴圈處理。硬體在接收資料讀完後清掉 <code>RCIF</code>。暫存區只有兩個位元組，長時間等不到處理可能溢位。連續接收時，讓 ISR 及早將資料存進程式的緩衝區，由主迴圈組成命令或回覆。</li>
+        </ul>
+        <p>在中斷函式只處理分配給這一級的來源。直接讀暫存器時，同時檢查 <code>IF</code> 與 <code>IE</code>，避免處理到已關閉但仍有旗標的來源。若中斷一返回就立刻再進來，先查旗標是否還是 1，例如序列接收還有資料未讀完。</p>
+        <p>ISR 修改且其他程式也會讀的變數要標成 <code>volatile</code>，讓編譯器每次實際讀取。這個設定無法保護多步操作。例如主程式讀取 16 位元計數值時，ISR 可能在兩個位元組的讀取之間更新它。要取得一致的值，可以先暫停會更新該變數的中斷來源，複製資料後立刻還原原本的開關狀態。<a href="https://onlinedocs.microchip.com/oxy/GUID-BB433107-FD4E-4D28-BB58-9D4A58955B1A-en-US-9/GUID-765B5807-91BF-43B9-B1C1-C08DA2C69A3A.html">XC8 共用資料說明</a></p>
+
+        <h3 id="interrupt-example" lang="en"><a class="heading-link" href="#interrupt-example">Button / UART Receive / Timer3</a></h3>
+        <p><code>RB0</code> 按鈕用高優先權，按下後由主迴圈確認腳位、切換 <code>RD0</code> 上的燈並輸出次數。Timer3 和 UART 接收用低優先權。Timer3 每約 500 毫秒切換 <code>RA1</code> 上的燈，主迴圈將收到的字元送回。這裡也可以選 Timer0。按鈕確認會呼叫 <code>delayMs()</code>，所以要保留 Timer1 的時間基準。<a href="#timers">比較計時器</a></p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+#include &lt;stdio.h&gt;
+
+#define BUTTON_PIN PIN_RB0
+#define LED_PIN    PIN_RD0
+#define BLINK_PIN  PIN_RA1
+#define BLINK_TIMER TIMER3
+
+static volatile bool pressed;
+static volatile bool has_byte;
+static volatile uint8_t received;
+
+void __interrupt(high_priority) isrHigh(void) {
+    if (pinInterruptFired(BUTTON_PIN)) pressed = true;
+}
+
+void __interrupt(low_priority) isrLow(void) {
+    uint8_t byte;
+    if (timerInterruptFired(BLINK_TIMER)) digitalToggle(BLINK_PIN);
+    if (uartRead(&amp;byte)) {
+        received = byte;
+        has_byte = true;
+    }
+}
+
+void main(void) {
+    uint8_t presses = 0;
+
+    halBegin();
+    pinMode(LED_PIN, OUTPUT);
+    pinMode(BLINK_PIN, OUTPUT);
+    uartBegin(9600);
+    uartPrint("ready\r\n");
+
+    if (!timerAttachInterrupt(BLINK_TIMER, 500, PRIORITY_LOW)) {
+        uartPrint("Blink timer setup failed\r\n");
+    }
+    pinAttachInterrupt(BUTTON_PIN, FALLING, PRIORITY_HIGH);
+    uartAttachInterrupt(PRIORITY_LOW);
+
+    while (1) {
+        if (pressed) {
+            delayMs(20);
+            pressed = false;
+            if (digitalRead(BUTTON_PIN) == LOW) {
+                digitalToggle(LED_PIN);
+                printf("presses: %u\r\n", ++presses);
+            }
+        }
+
+        if (has_byte) {
+            has_byte = false;
+            uartWrite(received);
+        }
+    }
+}</code></pre>
+        </details>
+        <p>若閃燈計時器設定失敗，序列埠會顯示 <code>Blink timer setup failed</code>，按鈕與回傳字元仍可使用。<a href="#wiring">腳位與接線</a></p>
+        <p>這個範例的接收端只留一格給主迴圈。逐字鍵入適合觀察結果。連續貼上文字時，新字元可能在舊字元送出前覆蓋它。若要收整行命令，固定由一處讀取硬體接收暫存器，並用能排隊存放多個位元組的緩衝區傳給主迴圈。</p>
+      </section>
+
+      <section>
+        <h2 id="timers" lang="en"><a class="heading-link" href="#timers">Hardware Timers</a></h2>
+        <p>用 <code>timerAttachInterrupt(timer, period_ms, priority)</code> 可讓任一顆計時器觸發週期中斷。第一個參數選計時器，第二個設定間隔（毫秒），第三個決定由高優先權或低優先權的中斷函式處理。先看計時器是否已被其他功能使用，再看目前時脈能設定多長的週期。</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="四顆硬體計時器比較">
+          <table>
+            <thead><tr><th scope="col">計時器</th><th scope="col">中斷從哪來</th><th scope="col">可設定的最長週期（500 kHz / 8 MHz）</th><th scope="col">怎麼選</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><a href="#timer0">Timer0</a></th><td>計滿回到 0，由程式重載。</td><td>65535 / 8388 毫秒</td><td>一般週期中斷可先選它。四顆中可設定的週期最長。</td></tr>
+              <tr><th scope="row"><a href="#timer1">Timer1</a></th><td>計滿回到 0，由程式重載。</td><td>4194 / 262 毫秒</td><td>函式庫預設用它量時間。有用 <code>timerNow()</code>、<code>delayMs()</code> 或 <code>Button</code> 就保留它。</td></tr>
+              <tr><th scope="row"><a href="#timer2">Timer2</a></th><td>硬體自動重複計數，累積指定次數才中斷。</td><td>524 / 32 毫秒</td><td>適合短週期，下一輪可準時開始。有脈波寬度調變（PWM）或伺服輸出就保留它。</td></tr>
+              <tr><th scope="row"><a href="#timer3">Timer3</a></th><td>計滿回到 0，由程式重載。</td><td>4194 / 262 毫秒</td><td>Timer0 已有用途時可選它。若用它做訊號捕捉或比較，要先確認是否共用計數。</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>表格列出函式庫接受的整數毫秒。500 kHz 是函式庫預設的晶片時脈。Timer0 在此時脈下硬體可數約 134 秒，<code>period_ms</code> 的 16 位元限制把單次設定上限降為 65535 毫秒。以 500 毫秒為例，預設時脈下四顆都能設定。在 8 MHz 時只有 Timer0 能直接設定這個間隔。若要超過上限，可以把間隔縮短，再累積多次中斷。</p>
+        <p>函式庫用內部時脈計數，基本輸入是振盪器頻率 <code>Fosc</code> 除以 4。前分頻（prescaler）把進入計數器的脈波減慢，每格時間變長，同樣的計數範圍就能涵蓋更長的間隔。函式庫會根據毫秒數自動選擇分頻和計數值。<a href="https://ww1.microchip.com/downloads/en/devicedoc/39631e.pdf#page=125">Microchip 資料表第 11～14 章</a></p>
+
+        <h3 id="timer-uses" lang="en"><a class="heading-link" href="#timer-uses">What Timers Do</a></h3>
+        <p>計時器的基本工作是累計脈波。只要計時器已開啟且有時脈，即使關掉中斷，它也會繼續計數，程式仍可直接讀取數值。要拿來做什麼，取決於脈波從哪來，以及誰使用計數結果。</p>
+        <ul>
+          <li><strong>量經過多久。</strong>用晶片內部時脈計數，讀起點和終點再相減。HAL 的 <code>timerNow()</code> 就是讀 Timer1。預設每格 8 微秒，相差 125 格就是 1 毫秒。</li>
+          <li><strong>數外部事件。</strong>直接設定硬體時，Timer0 可從 <code>RA4/T0CKI</code> 計數，Timer1 或 Timer3 可用 <code>RC0/T13CKI</code>。例如讓轉速感測器每轉一圈送一個脈波，再讀計數值求轉了幾圈。</li>
+          <li><strong>記下訊號變化的時間。</strong>捕捉模式（Capture）會在腳位出現指定的變化時，把 Timer1 或 Timer3 的計數存進另一個暫存器。例如記下一個訊號兩次上升的時間，可以算出它的週期。</li>
+          <li><strong>在指定時刻執行硬體動作。</strong>比較模式（Compare）會讓硬體將 Timer1 或 Timer3 的計數與預設值比對。數到指定值時能切換輸出腳位。第二組捕捉、比較與脈波寬度調變模組 <code>CCP2</code> 也能在比對時啟動已啟用的類比數位轉換器。</li>
+          <li><strong>持續輸出脈波。</strong>脈波寬度調變（PWM）用 Timer2 決定每一輪有多長，硬體反覆產生波形。例如每 20 毫秒送一個脈波給伺服馬達。</li>
+        </ul>
+        <p>這顆晶片的捕捉與比較模式可以選 Timer1 或 Timer3，選擇由 <code>T3CON</code> 的計時器分配位元決定。兩路 PWM 共用 Timer2。<a href="https://ww1.microchip.com/downloads/en/devicedoc/39631e.pdf#page=142">Microchip 資料表第 15.1～15.4 節</a></p>
+
+        <h3 id="timer-example" lang="en"><a class="heading-link" href="#timer-example">Periodic Interrupt Example</a></h3>
+        <p>同一支程式可以試四顆計時器。預設選 Timer0，讓 <code>RA1</code> 的燈每約 500 毫秒切換一次。更換 <code>BLINK_TIMER</code> 後，初始化和中斷函式會一起改用同一顆。</p>
+        <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+#define BLINK_TIMER TIMER0
+
+void __interrupt(low_priority) isrLow(void) {
+    if (timerInterruptFired(BLINK_TIMER)) {
+        digitalToggle(PIN_RA1);
+    }
+}
+
+void main(void) {
+    halBegin();
+    pinMode(PIN_RA1, OUTPUT);
+    digitalWrite(PIN_RA1, LOW);
+
+    if (!timerAttachInterrupt(BLINK_TIMER, 500, PRIORITY_LOW)) {
+        digitalWrite(PIN_RA1, HIGH);
+    }
+
+    for (;;) { NOP(); }
+}</code></pre>
+        <ul>
+          <li>第二個參數改成 <code>250</code>，燈每約 250 毫秒切換一次，亮到下次亮約 500 毫秒。</li>
+          <li>若選 <code>PRIORITY_HIGH</code>，也將中斷函式改成 <code>__interrupt(high_priority)</code>。優先權決定由哪個函式處理，以及能否打斷低優先權的處理。</li>
+          <li><code>timerAttachInterrupt()</code> 成功回傳 <code>true</code>，前面的 <code>!</code> 讓分支只在失敗時執行。間隔為 0、超出上限、計時器或優先權無效，或 Timer2 已用於脈波輸出，都會回傳 <code>false</code>。這個範例用燈恆亮表示失敗。</li>
+        </ul>
+        <p>需要兩組間隔時，可讓一顆每 10 毫秒中斷，數 10 次做 100 毫秒的工作，數 50 次做 500 毫秒的工作。要各自使用硬體計數時，可分別設定 Timer0 為 500 毫秒、Timer3 為 250 毫秒。在對應優先權的中斷函式中分別呼叫 <code>timerInterruptFired(TIMER0)</code> 與 <code>timerInterruptFired(TIMER3)</code>。同一顆重新設定會取代先前的設定。</p>
+
+        <h3 id="timer0" lang="en"><a class="heading-link" href="#timer0">Timer0</a></h3>
+        <p>硬體支援 8 位元或 16 位元計數，前分頻可選 1、2、4、8、16、32、64、128、256。函式庫使用 16 位元。在 500 kHz 下用 1:1 前分頻，每秒數 125000 格。要等 500 毫秒，就從 <code>65536 - 62500 = 3036</code> 開始數。溢位（由 65535 回到 0）後，<code>timerInterruptFired()</code> 會重載 3036 並清除旗標。從溢位到重載的等待時間也會算進兩次中斷的間隔。</p>
+
+        <h3 id="timer1" lang="en"><a class="heading-link" href="#timer1">Timer1</a></h3>
+        <p>16 位元，前分頻可選 1、2、4、8，也可使用 Timer1 振盪器。<code>halBegin()</code> 會讓它持續計數，預設每格 8 微秒，每 524.288 毫秒自然回到 0。<code>timerNow()</code> 讀取目前的計數，<code>delayMs()</code> 和 <code>Button</code> 用兩次讀值相減算經過的時間。若把 Timer1 交給 <code>timerAttachInterrupt()</code>，函式庫可能改變分頻，且每次中斷都會重載計數，原本的算式就會失準。</p>
+
+        <h3 id="timer2" lang="en"><a class="heading-link" href="#timer2">Timer2</a></h3>
+        <p>8 位元，只用內部時脈。前分頻可選 1、4、16。硬體從 0 數到週期暫存器 <code>PR2</code>，每 <code>PR2 + 1</code> 格比對一次並開始下一輪。後分頻（postscaler）決定累積幾次比對才觸發中斷，可選 1～16。若每 2 毫秒比對一次、後分頻設為 10，就每 20 毫秒中斷一次，脈波輸出週期仍是 2 毫秒。</p>
+        <p>因為硬體會開始下一輪，<code>timerInterruptFired(TIMER2)</code> 只清旗標。若程式忙到錯過數次中斷，一個旗標無法告訴你錯過了幾次。函式庫會拒絕同時用 Timer2 產生脈波和設定週期中斷，避免其中一方改到共用的 <code>PR2</code> 或前分頻。</p>
+
+        <h3 id="timer3" lang="en"><a class="heading-link" href="#timer3">Timer3</a></h3>
+        <p>16 位元，前分頻可選 1、2、4、8，可共用 Timer1 的振盪器。Timer3 有自己的計數值和旗標，可跟 Timer0 同時運作。它和 Timer0 一樣由中斷函式重載，所以重載延遲也會拉長間隔。若捕捉或比較模組選 Timer3 當時間基準，重載會一併改變該模組讀到的時間。</p>
+      </section>
+
+      <section>
+        <h2 id="sources" lang="en"><a class="heading-link" href="#sources">References</a></h2>
+        <ul>
+          <li><a href="../lib/pic18f4520_hal.h">pic18f4520_hal.h</a> 定義函式庫的介面，<a href="#config">pic18f4520_config.h</a> 定義晶片的啟動設定。</li>
+          <li><a href="https://ww1.microchip.com/downloads/en/devicedoc/39631e.pdf">Microchip PIC18F4520 資料表（DS39631E）</a>。第 9 章是中斷，第 11～14 章是計時器，第 15～16 章是捕捉、比較與 PWM，第 18 章是 EUSART，第 19 章是 ADC。</li>
+          <li><a href="https://www.microchip.com/content/dam/mchp/documents/OTH/ProductDocuments/UserGuides/51795B.pdf">Microchip PICkit 3 使用手冊（DS51795B）</a>。圖 1-2 是接頭排列，第 2.4 節是目標板接線。</li>
+          <li><a href="https://onlinedocs.microchip.com/oxy/GUID-BB433107-FD4E-4D28-BB58-9D4A58955B1A-en-US-9/GUID-2AC0BB59-9083-4213-A961-F40BE6B91AF6.html">MPLAB XC8 中斷函式說明</a>。查閱 <code>__interrupt()</code> 和中斷入口。</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 id="examples" lang="en"><a class="heading-link" href="#examples">Examples (Labs 6–10)</a></h2>
+        <p>每題都是獨立的 C 程式，用 MPLAB XC8 編譯，目標晶片選 PIC18F4520。<a href="#include-path">標頭檔的相對路徑</a>依來源檔的位置調整。HAL 的內部時脈預設為 500 kHz。序列計算機將時脈設為 4 MHz，讓逐字更新燈號時能更快讀取下一個字元。</p>
+        <p>有按鈕的範例使用低電平觸發，按鈕接 RB0 與地，並啟用內部上拉。LED 採輸出高時點亮，請串限流電阻。伺服訊號接 RC2，馬達電源依規格供應並與晶片共地。範例以 500～2400 微秒作為端點，通電前請按實際馬達規格調整。<a href="#wiring">腳位與接線</a></p>
+
+        <h3 id="lab6" lang="en"><a class="heading-link" href="#lab6">Lab 6 (Digital Pins)</a></h3>
+        <p>將按鈕接到 RB0，三顆 LED 依低位到高位接 RA0、RA1、RA2。</p>
+        <h4 id="lab6-basic" lang="en"><a class="heading-link" href="#lab6-basic">Increment on a Button Press (Basic)</a></h4>
+        <p>用 <code>buttonPressed()</code> 取得去彈跳後的按下事件。顯示值從 0 加到 7，再回到 0。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const Pin leds[] = {PIN_RA0, PIN_RA1, PIN_RA2};
+
+void main(void) {
+    Button button;
+    uint8_t value = 0;
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 3; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 3, value);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+
+    for (;;) {
+        if (buttonPressed(&amp;button)) {
+            value = (value + 1U) &amp; 7U;
+            digitalWriteBits(leds, 3, value);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab6-advance" lang="en"><a class="heading-link" href="#lab6-advance">Start / Reverse the Counter (Advance)</a></h4>
+        <p>開機停在 0。第一次按下後，每 0.5 秒加一。之後按下只切換方向，主迴圈在等候期間持續讀取按鈕。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const Pin leds[] = {PIN_RA0, PIN_RA1, PIN_RA2};
+
+void main(void) {
+    Button button;
+    uint8_t value = 0;
+    bool running = false, up = true;
+    uint16_t last = 0;
+    const uint16_t interval = timerTicks(500, 1);
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 3; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 3, value);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+
+    for (;;) {
+        if (buttonPressed(&amp;button)) {
+            if (running) up = !up;
+            else {
+                running = true;
+                last = timerNow();
+            }
+        }
+
+        if (running &amp;&amp; (uint16_t)(timerNow() - last) &gt;= interval) {
+            last += interval;
+            value = (value + (up ? 1U : 7U)) &amp; 7U;
+            digitalWriteBits(leds, 3, value);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab6-hard" lang="en"><a class="heading-link" href="#lab6-hard">Three LED Patterns (Hard)</a></h4>
+        <p>每次按下立刻切換模式。先全暗，再依序單亮 RA0、RA1、RA2。第三種模式讓 RA0、RA1 各亮 1 秒，再讓 RA2 每 0.5 秒切換、總共維持 2.5 秒。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const Pin leds[] = {PIN_RA0, PIN_RA1, PIN_RA2};
+static const uint8_t chase[] = {1, 2, 4};
+static const uint8_t flash[] = {1, 1, 2, 2, 4, 0, 4, 0, 4};
+
+void main(void) {
+    Button button;
+    uint8_t state = 0, step = 0;
+    const uint16_t interval = timerTicks(500, 1);
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 3; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 3, 0);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    uint16_t last = timerNow();
+
+    for (;;) {
+        if (buttonPressed(&amp;button)) {
+            state = (state + 1U) % 3U;
+            step = 0;
+            last = timerNow();
+            digitalWriteBits(leds, 3, state ? 1 : 0);
+        } else if (state &amp;&amp; (uint16_t)(timerNow() - last) &gt;= interval) {
+            last += interval;
+            if (state == 1) {
+                step = (step + 1U) % sizeof(chase);
+                digitalWriteBits(leds, 3, chase[step]);
+            } else {
+                step = (step + 1U) % sizeof(flash);
+                digitalWriteBits(leds, 3, flash[step]);
+            }
+        }
+    }
+}</code></pre>
+        </details>
+
+        <h3 id="lab7" lang="en"><a class="heading-link" href="#lab7">Lab 7 (Interrupts / Timers)</a></h3>
+        <p>將按鈕接到 RB0。四顆 LED 從左至右接 RD7、RD6、RD5、RD4。</p>
+        <h4 id="lab7-basic" lang="en"><a class="heading-link" href="#lab7-basic">Bidirectional 4-Bit Counter (Basic)</a></h4>
+        <p>開機從 0 往上數，每 0.5 秒更新。按下只改變下一步的方向，保留當前數值。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const Pin leds[] = {PIN_RD4, PIN_RD5, PIN_RD6, PIN_RD7};
+
+void main(void) {
+    Button button;
+    uint8_t value = 0;
+    bool up = true;
+    const uint16_t interval = timerTicks(500, 1);
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, value);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    uint16_t last = timerNow();
+
+    for (;;) {
+        if (buttonPressed(&amp;button)) up = !up;
+        if ((uint16_t)(timerNow() - last) &gt;= interval) {
+            last += interval;
+            value = (value + (up ? 1U : 15U)) &amp; 15U;
+            digitalWriteBits(leds, 4, value);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab7-advance" lang="en"><a class="heading-link" href="#lab7-advance">Pause / Automatic Resume (Advance)</a></h4>
+        <p>從 15 往下數。Timer2 每 10 毫秒發出一次中斷，50 次更新一格。暫停後若 10 秒內沒有再按，程式自動繼續。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const Pin leds[] = {PIN_RD4, PIN_RD5, PIN_RD6, PIN_RD7};
+static volatile uint8_t ticks;
+
+void __interrupt(low_priority) isrLow(void) {
+    if (timerInterruptFired(TIMER2)) ++ticks;
+}
+
+void main(void) {
+    Button button;
+    uint8_t value = 15, last = 0, paused_intervals = 0;
+    bool paused = false;
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, value);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    if (!timerAttachInterrupt(TIMER2, 10, PRIORITY_LOW)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        if (buttonPressed(&amp;button)) {
+            paused = !paused;
+            paused_intervals = 0;
+            last = ticks;
+        }
+
+        if ((uint8_t)(ticks - last) &gt;= 50) {
+            last += 50;
+            if (paused) {
+                if (++paused_intervals == 20) paused = false;
+            } else {
+                value = (value + 15U) &amp; 15U;
+                digitalWriteBits(leds, 4, value);
+            }
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab7-hard" lang="en"><a class="heading-link" href="#lab7-hard">LED Locking Game (Hard)</a></h4>
+        <p>第一次按下開始，亮點從 RD4 向 RD7 移動。外部中斷記下按下時的目標，短按放開才切換鎖定。每多鎖一顆，步進間隔從 1 秒依序降到 0.75、0.5、0.25 秒。全鎖定後全亮 2 秒，長按 3 秒會重設並取消這次鎖定操作。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+typedef enum { IDLE, PLAYING, WON } GameState;
+
+static const Pin leds[] = {PIN_RD4, PIN_RD5, PIN_RD6, PIN_RD7};
+static volatile uint8_t ticks, shot;
+static volatile uint8_t active = 1;
+
+void __interrupt(high_priority) isrHigh(void) {
+    if (pinInterruptFired(PIN_RB0)) shot = active;
+}
+
+void __interrupt(low_priority) isrLow(void) {
+    if (timerInterruptFired(TIMER2)) ++ticks;
+}
+
+void main(void) {
+    Button button;
+    GameState state = IDLE;
+    uint8_t locked = 0, action = 0, interval = 40, last = 0, pressed_at = 0;
+    bool held = false;
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, 0);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    if (!timerAttachInterrupt(TIMER2, 25, PRIORITY_LOW) ||
+        !pinAttachInterrupt(PIN_RB0, FALLING, PRIORITY_HIGH)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        uint8_t now = ticks;
+        if (buttonPressed(&amp;button)) {
+            held = true;
+            pressed_at = now;
+            if (state == IDLE) {
+                state = PLAYING;
+                active = 1;
+                interval = 40;
+                last = now;
+                digitalWriteBits(leds, 4, active);
+            } else if (state == PLAYING) {
+                action = shot;
+            }
+        }
+
+        if ((state == PLAYING &amp;&amp; held &amp;&amp; (uint8_t)(now - pressed_at) &gt;= 121) ||
+            (state == WON &amp;&amp; (uint8_t)(now - last) &gt;= 80)) {
+            state = IDLE;
+            locked = action = 0;
+            held = false;
+            digitalWriteBits(leds, 4, 0);
+        }
+
+        if (buttonReleased(&amp;button)) {
+            held = false;
+            if (state == PLAYING &amp;&amp; action) {
+                locked ^= action;
+                last = now;
+                interval = 40;
+                for (uint8_t bits = locked; bits; bits &gt;&gt;= 1)
+                    if (bits &amp; 1U) interval -= 10;
+                if (locked == 15) state = WON;
+                digitalWriteBits(leds, 4, locked | active);
+            }
+            action = 0;
+        }
+
+        if (state == PLAYING &amp;&amp; (uint8_t)(now - last) &gt;= interval) {
+            last += interval;
+            active = active == 8 ? 1 : (uint8_t)(active &lt;&lt; 1);
+            digitalWriteBits(leds, 4, locked | active);
+        }
+    }
+}</code></pre>
+        </details>
+
+        <h3 id="lab8" lang="en"><a class="heading-link" href="#lab8">Lab 8 (Servo Control)</a></h3>
+        <p>將按鈕接到 RB0，伺服訊號接 RC2。程式在按鈕放開時才執行動作。</p>
+        <h4 id="lab8-basic" lang="en"><a class="heading-link" href="#lab8-basic">Move in 45° Steps (Basic)</a></h4>
+        <p>從 −90° 起步，每次放開移動 45°。到任一端點時，下一步改向另一端。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+void main(void) {
+    Button button;
+    Servo servo;
+    int8_t step = 45;
+
+    halBegin();
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    if (!servoAttach(&amp;servo, PIN_RC2, -90, 90, 500, 2400)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        if (buttonReleased(&amp;button)) {
+            int16_t angle = servo.angle + step;
+            if (angle == servo.min_angle || angle == servo.max_angle) step = -step;
+            servoWrite(&amp;servo, angle);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab8-advance" lang="en"><a class="heading-link" href="#lab8-advance">Start / Stop the Sweep (Advance)</a></h4>
+        <p>開機停在 −90°。每次放開切換運轉狀態，暫停時維持原角度。Timer1 每隔一段時間移動 2°，往返一次約 5 秒。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+void main(void) {
+    Button button;
+    Servo servo;
+    int8_t step = 2;
+    bool running = false;
+    const uint16_t interval = timerTicks(5000, 180);
+
+    halBegin();
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    if (!servoAttach(&amp;servo, PIN_RC2, -90, 90, 500, 2400)) {
+        for (;;) { NOP(); }
+    }
+    uint16_t last = timerNow();
+
+    for (;;) {
+        if (buttonReleased(&amp;button)) {
+            running = !running;
+            last = timerNow();
+        }
+
+        if (running &amp;&amp; (uint16_t)(timerNow() - last) &gt;= interval) {
+            last += interval;
+            int16_t angle = servo.angle + step;
+            if (angle == servo.min_angle || angle == servo.max_angle) step = -step;
+            servoWrite(&amp;servo, angle);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab8-hard" lang="en"><a class="heading-link" href="#lab8-hard">Switch Between Three Speeds (Hard)</a></h4>
+        <p>開機就開始往返。每次放開在 3、2、1 秒的往返週期之間循環切換。以 6° 為一步，沿著當前方向繼續移動。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const uint16_t cycles_ms[] = {3000, 2000, 1000};
+
+void main(void) {
+    Button button;
+    Servo servo;
+    int8_t step = 6;
+    uint8_t speed = 0;
+    uint16_t interval = timerTicks(cycles_ms[speed], 60);
+
+    halBegin();
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    if (!servoAttach(&amp;servo, PIN_RC2, -90, 90, 500, 2400)) {
+        for (;;) { NOP(); }
+    }
+    uint16_t last = timerNow();
+
+    for (;;) {
+        if (buttonReleased(&amp;button)) {
+            speed = (speed + 1U) % 3U;
+            interval = timerTicks(cycles_ms[speed], 60);
+            last = timerNow();
+        }
+
+        if ((uint16_t)(timerNow() - last) &gt;= interval) {
+            last += interval;
+            int16_t angle = servo.angle + step;
+            if (angle == servo.min_angle || angle == servo.max_angle) step = -step;
+            servoWrite(&amp;servo, angle);
+        }
+    }
+}</code></pre>
+        </details>
+
+        <h3 id="lab9" lang="en"><a class="heading-link" href="#lab9">Lab 9 (Analog Input)</a></h3>
+        <p>可變電阻兩端接 VDD、VSS，滑動端接 RA0。</p>
+        <h4 id="lab9-basic" lang="en"><a class="heading-link" href="#lab9-basic">Display the Digits of a Student Number (Basic)</a></h4>
+        <p>將四顆 LED 依低位到高位接 RA1～RA4。把類比讀值分成八段，每段顯示 <code>digits</code> 裡的一個數字。把示範數字換成自己的學號。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+#define POT_PIN PIN_RA0
+
+static const uint8_t digits[] = {1, 4, 1, 3, 6, 0, 3, 7};
+static const Pin leds[] = {PIN_RA1, PIN_RA2, PIN_RA3, PIN_RA4};
+
+void main(void) {
+    halBegin();
+    analogBegin(POT_PIN);
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, 0);
+
+    for (;;) {
+        uint16_t raw;
+        if (analogRead(POT_PIN, &amp;raw)) {
+            uint8_t index = (uint32_t)raw * sizeof(digits) / 1024U;
+            digitalWriteBits(leds, 4, digits[index]);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab9-advance" lang="en"><a class="heading-link" href="#lab9-advance">Use Different Steps for Rising / Falling Voltage (Advance)</a></h4>
+        <p>沿用 Basic 的 RA0 電位器和 RA1～RA4 的 LED 接線。電壓上升時將讀值切成 16 段，下降時切成 6 段並顯示 15、12、9、6、3、0。方向判斷保留 8 格容許範圍，減少滑動端抖動造成的切換。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+#define POT_PIN PIN_RA0
+
+static const Pin leds[] = {PIN_RA1, PIN_RA2, PIN_RA3, PIN_RA4};
+
+void main(void) {
+    uint16_t reference = 0;
+    bool down = false;
+
+    halBegin();
+    analogBegin(POT_PIN);
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, 0);
+
+    for (;;) {
+        uint16_t raw;
+        if (!analogRead(POT_PIN, &amp;raw)) continue;
+
+        if (raw &gt; reference + 8U || raw + 8U &lt; reference) {
+            down = raw &lt; reference;
+            reference = raw;
+        }
+
+        uint8_t value = down ? 3U * (raw * 6U / 1024U) : raw / 64U;
+        digitalWriteBits(leds, 4, value);
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab9-hard" lang="en"><a class="heading-link" href="#lab9-hard">Select a Servo Angle from Three Ranges (Hard)</a></h4>
+        <p>三顆 LED 從左到右接 RA1～RA3，按鈕接 RB0，伺服訊號接 RC2。旋鈕決定亮哪顆燈。按下時才更新角度，之後維持在 0°、90° 或 180°。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+
+static const Pin leds[] = {PIN_RA1, PIN_RA2, PIN_RA3};
+
+void main(void) {
+    Button button;
+    Servo servo;
+
+    halBegin();
+    analogBegin(PIN_RA0);
+    for (uint8_t i = 0; i &lt; 3; ++i) pinMode(leds[i], OUTPUT);
+    portbPullups(true);
+    buttonBegin(&amp;button, PIN_RB0, false, 20);
+    if (!servoAttach(&amp;servo, PIN_RC2, 0, 180, 500, 2400)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        uint16_t raw;
+        if (!analogRead(PIN_RA0, &amp;raw)) continue;
+        uint8_t region = raw * 3U / 1024U;
+        digitalWriteBits(leds, 3, 1U &lt;&lt; region);
+        if (buttonPressed(&amp;button)) servoWrite(&amp;servo, region * 90U);
+    }
+}</code></pre>
+        </details>
+
+        <h3 id="lab10" lang="en"><a class="heading-link" href="#lab10">Lab 10 (UART)</a></h3>
+        <p>依序列通訊接線表接轉接器，終端機設為 9600、8 個資料位元、無同位檢查、1 個停止位元。</p>
+        <h4 id="lab10-basic" lang="en"><a class="heading-link" href="#lab10-basic">Command-Controlled Counter (Basic)</a></h4>
+        <p>四顆 LED 依低位到高位接 RD4～RD7。Timer2 每 10 毫秒提供時間刻度。程式逐字收指令，仍會計數。按 Enter 執行 <code>START</code>、<code>STOP</code>、<code>UP</code>、<code>DOWN</code> 或 <code>SPEED 0.3</code> 等指令。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+#include &lt;string.h&gt;
+
+static const Pin leds[] = {PIN_RD4, PIN_RD5, PIN_RD6, PIN_RD7};
+static volatile uint8_t ticks;
+
+void __interrupt(low_priority) isrLow(void) {
+    if (timerInterruptFired(TIMER2)) ++ticks;
+}
+
+void main(void) {
+    uint8_t value = 0, interval = 100, last = 0, used = 0;
+    bool running = true, up = true, overflow = false;
+    char line[10];
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, value);
+    if (!uartBegin(9600) || !timerAttachInterrupt(TIMER2, 10, PRIORITY_LOW)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        uint8_t byte;
+        if (uartRead(&amp;byte)) {
+            if (byte == '\r' || byte == '\n') {
+                line[used] = '\0';
+                if (used &amp;&amp; !overflow) {
+                    if (!strcmp(line, "START") &amp;&amp; !running) {
+                        running = true;
+                        last = ticks;
+                    } else if (!strcmp(line, "STOP")) {
+                        running = false;
+                    } else if (!strcmp(line, "UP")) {
+                        up = true;
+                    } else if (!strcmp(line, "DOWN")) {
+                        up = false;
+                    } else if (used == 9 &amp;&amp; !strncmp(line, "SPEED ", 6) &amp;&amp; line[7] == '.') {
+                        if (line[6] == '0' &amp;&amp; line[8] &gt;= '1' &amp;&amp; line[8] &lt;= '9') {
+                            interval = (line[8] - '0') * 10;
+                            last = ticks;
+                        } else if (line[6] == '1' &amp;&amp; line[8] == '0') {
+                            interval = 100;
+                            last = ticks;
+                        }
+                    }
+                }
+                used = 0;
+                overflow = false;
+            } else if (used &lt; sizeof(line) - 1U) {
+                line[used++] = (char)byte;
+            } else {
+                overflow = true;
+            }
+        }
+
+        if (running &amp;&amp; (uint8_t)(ticks - last) &gt;= interval) {
+            last += interval;
+            value = (value + (up ? 1U : 15U)) &amp; 15U;
+            digitalWriteBits(leds, 4, value);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab10-advance" lang="en"><a class="heading-link" href="#lab10-advance">Integer Calculator (Advance)</a></h4>
+        <p>沿用四顆 LED 接線並關閉終端機本機回顯。程式用 <code>getchar()</code> 等下一個字元。輸入數字時顯示低四位，輸入 <code>+</code>、<code>-</code> 或 <code>*</code> 時清除燈號。先累計乘積，再處理加減。輸入 <code>2+3*4</code> 後按 Enter 會顯示 <code>=14</code>，第二次按 Enter 清除結果並熄燈。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#define HAL_FOSC_HZ 4000000UL
+#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+#include &lt;stdio.h&gt;
+
+static const Pin leds[] = {PIN_RD4, PIN_RD5, PIN_RD6, PIN_RD7};
+
+static void addNumber(long *sum, long *term, char op, uint8_t number) {
+    if (op == '*') {
+        *term *= number;
+    } else {
+        *sum += *term;
+        *term = op == '-' ? -(long)number : (long)number;
+    }
+}
+
+void main(void) {
+    long sum = 0, term = 0;
+    uint8_t number = 0, digits = 0, operators = 0;
+    char op = '+';
+    bool showing_result = false, skip_lf = false;
+
+    halBegin();
+    for (uint8_t i = 0; i &lt; 4; ++i) pinMode(leds[i], OUTPUT);
+    digitalWriteBits(leds, 4, 0);
+    if (!uartBegin(9600)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        uint8_t byte = (uint8_t)getchar();
+        if (byte == '\n' &amp;&amp; skip_lf) {
+            skip_lf = false;
+            continue;
+        }
+        skip_lf = byte == '\r';
+
+        if (byte == '\r' || byte == '\n') {
+            if (showing_result) {
+                sum = term = 0;
+                number = digits = operators = 0;
+                op = '+';
+                showing_result = false;
+                digitalWriteBits(leds, 4, 0);
+                uartPrint("\r\033[2K");
+            } else if (digits &amp;&amp; operators) {
+                addNumber(&amp;sum, &amp;term, op, number);
+                long result = sum + term;
+                digitalWriteBits(leds, 4, (uint16_t)result);
+                printf("\r\n=%ld", result);
+                showing_result = true;
+            }
+        } else if (!showing_result &amp;&amp; byte &gt;= '0' &amp;&amp; byte &lt;= '9' &amp;&amp; digits &lt; 2) {
+            number = (uint8_t)(number * 10 + byte - '0');
+            ++digits;
+            uartWrite(byte);
+            digitalWriteBits(leds, 4, number);
+        } else if (!showing_result &amp;&amp; digits &amp;&amp; operators &lt; 3 &amp;&amp;
+                   (byte == '+' || byte == '-' || byte == '*')) {
+            addNumber(&amp;sum, &amp;term, op, number);
+            op = (char)byte;
+            number = digits = 0;
+            ++operators;
+            uartWrite(byte);
+            digitalWriteBits(leds, 4, 0);
+        }
+    }
+}</code></pre>
+        </details>
+        <h4 id="lab10-hard" lang="en"><a class="heading-link" href="#lab10-hard">Record Four Servo Positions (Hard)</a></h4>
+        <p>可變電阻兩端接 VDD、VSS，滑動端接 RA0。伺服訊號接 RC2，終端機關閉本機回顯。開機先用 <code>servoAttach()</code> 初始化，再用 <code>servoWrite()</code> 設定為 0°。輸入 <code>m1</code> 用旋鈕選角度，或輸入 <code>m2</code> 直接輸入角度。每按一次 Enter 記錄一點。記滿四點才依序移動，每點停 2 秒，再顯示 <code>DONE</code>。</p>
+        <details class="example-code">
+          <summary>完整 C 程式</summary>
+          <pre><code class="language-c">#include "../../lib/pic18f4520_config.h"
+#include "../../lib/pic18f4520_hal.h"
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+
+static bool readKey(uint8_t *key) {
+    static bool skip_lf;
+
+    if (!uartRead(key)) return false;
+    if (*key == '\n' &amp;&amp; skip_lf) {
+        skip_lf = false;
+        return false;
+    }
+    skip_lf = *key == '\r';
+    if (skip_lf) *key = '\n';
+    return true;
+}
+
+static void readLine(char *line, uint8_t size) {
+    uint8_t used = 0;
+    bool overflow = false;
+
+    for (;;) {
+        uint8_t key;
+        if (!readKey(&amp;key)) continue;
+        if (key == '\n') {
+            line[overflow ? 0 : used] = '\0';
+            uartPrint("\r\n");
+            return;
+        }
+        if (used &lt; size - 1U) {
+            line[used++] = (char)key;
+            uartWrite(key);
+        } else {
+            overflow = true;
+        }
+    }
+}
+
+static int16_t readPotAngle(void) {
+    int16_t shown = 91;
+
+    for (;;) {
+        uint16_t raw;
+        if (analogRead(PIN_RA0, &amp;raw)) {
+            int16_t angle = (int16_t)(((uint32_t)raw * 180U + 511U) / 1023U) - 90;
+            if (angle != shown) {
+                if (shown != 91) uartPrint("\b\b\b\b");
+                printf("%4d", (int)angle);
+                shown = angle;
+            }
+        }
+
+        uint8_t key;
+        if (readKey(&amp;key) &amp;&amp; key == '\n' &amp;&amp; shown != 91) {
+            uartPrint("\r\n");
+            return shown;
+        }
+    }
+}
+
+static void moveTo(Servo *servo, uint8_t position, int16_t target) {
+    for (;;) {
+        printf("Point %u/4 | Current: %d | Target: %d\r\n",
+               (unsigned)position, (int)servo-&gt;angle, (int)target);
+        int16_t remaining = target - servo-&gt;angle;
+        if (!remaining) break;
+        int16_t step = remaining &gt; 5 ? 5 : remaining &lt; -5 ? -5 : remaining;
+        servoWrite(servo, servo-&gt;angle + step);
+        delayMs(20);
+    }
+    delayMs(2000);
+}
+
+void main(void) {
+    Servo servo;
+    char line[16];
+    int16_t targets[4];
+
+    halBegin();
+    if (!uartBegin(9600) || !analogBegin(PIN_RA0) ||
+        !servoAttach(&amp;servo, PIN_RC2, -90, 90, 500, 2400) || !servoWrite(&amp;servo, 0)) {
+        for (;;) { NOP(); }
+    }
+
+    for (;;) {
+        uartPrint("Select Mode (m1/m2)\r\n");
+        readLine(line, sizeof(line));
+        bool pot = !strcmp(line, "m1");
+        if (!pot &amp;&amp; strcmp(line, "m2")) continue;
+
+        for (uint8_t i = 0; i &lt; 4; ++i) {
+            printf("Point %u/4: ", (unsigned)(i + 1));
+            if (pot) {
+                targets[i] = readPotAngle();
+            } else {
+                for (;;) {
+                    char *end;
+                    readLine(line, sizeof(line));
+                    long angle = strtol(line, &amp;end, 10);
+                    if (end != line &amp;&amp; !*end &amp;&amp; angle &gt;= -90 &amp;&amp; angle &lt;= 90) {
+                        targets[i] = (int16_t)angle;
+                        break;
+                    }
+                    uartPrint("Enter -90 to 90: ");
+                }
+            }
+        }
+
+        for (uint8_t i = 0; i &lt; 4; ++i) moveTo(&amp;servo, i + 1, targets[i]);
+        uartPrint("DONE\r\n");
+    }
+}</code></pre>
+        </details>
+      </section>
+      <section>
+        <h2 id="macos-screen" lang="en"><a class="heading-link" href="#macos-screen">Using screen on macOS</a></h2>
+        <p>有使用<a href="#makefile">範例 Makefile</a>時，可從專案目錄用 <code>make monitor</code> 開啟連線。</p>
+
+        <h3 id="screen-connect" lang="en"><a class="heading-link" href="#screen-connect">Connect / Type</a></h3>
+        <p>接好序列轉接器後，在 Mac 的終端機列出可用裝置。找到 <code>/dev/cu.usbserial-…</code> 或 <code>/dev/cu.usbmodem…</code>，將下面的路徑換成實際名稱。<code>pic18</code> 是這次連線的名稱，<code>9600</code> 要和 <code>uartBegin(9600)</code> 一致。</p>
+        <pre><code class="language-bash">ls /dev/cu.*
+screen -S pic18 /dev/cu.usbserial-XXXX 9600</code></pre>
+        <p>進入 <code>screen</code> 後直接打字，按鍵就會經由轉接器送到晶片。要讓晶片收到，將轉接器的 <code>TX</code> 接到 <code>RC7/RX</code>，兩邊共地。若目標板已有電源，轉接器的供電腳可以留空，但兩邊的訊號電壓仍須相容。<code>screen</code> 的序列連線預設關閉本機回顯，畫面要等晶片送回資料才會出現字元。</p>
+        <p>使用<a href="#uart">字元回傳範例</a>時，打 <kbd>A</kbd> 就會收到 <code>A</code>。使用 <a href="#lab10-basic">Lab 10 指令範例</a>時，輸入 <code>START</code> 後按 <kbd>Enter</kbd>。使用 <a href="#uart-printf"><code>printf()</code> 範例</a>時，先開 <code>screen</code> 再重設晶片，程式會在開機時印一次。</p>
+        <p>若韌體等完整的 <code>\r\n</code> 才回傳，打 <code>hello</code>，先按 <kbd>Enter</kbd> 送 <code>\r</code>，再按 <kbd>Ctrl+J</kbd> 送 <code>\n</code>。收到回傳時才會顯示 <code>hello</code>。若按完兩鍵仍是空白，確認板上已燒錄回傳程式，以及轉接器的 <code>TX</code> 已接到 <code>RC7/RX</code>。</p>
+
+        <h3 id="screen-reconnect" lang="en"><a class="heading-link" href="#screen-reconnect">Detach / Reconnect</a></h3>
+        <p>在一般終端機分頁輸入 <code>screen -ls</code>，列出現有的 <code>screen</code> 工作階段。一個工作階段會保留已開啟的序列埠和畫面。像 <code>12345.pic18</code> 這樣的項目，可以用開頭的編號 <code>12345</code> 或建立時取的名稱 <code>pic18</code> 來指定。</p>
+        <ul>
+          <li><strong>Detached。</strong>連線在背景。用 <code>screen -r 12345</code> 接回原本的畫面。<code>-r</code> 是 resume，也就是恢復這個工作階段。</li>
+          <li><strong>Attached。</strong>畫面已接到一個終端機分頁。切回那個分頁，或在目前的分頁執行 <code>screen -d -r 12345</code>。<code>-d</code> 是 detach，先從原分頁暫離，<code>-r</code> 再接到這個分頁。</li>
+          <li><strong>No Sockets found。</strong>目前沒有工作階段，執行上面的連線指令開啟序列埠。</li>
+        </ul>
+        <p>在 <code>screen</code> 裡要暫離時，先按 <kbd>Ctrl+A</kbd>，放開後按 <kbd>d</kbd>。這會回到 Mac 的命令提示符，<code>screen</code> 則繼續在背景接收並占用序列埠。</p>
+
+        <h3 id="screen-quit" lang="en"><a class="heading-link" href="#screen-quit">Quit</a></h3>
+        <p>在 <code>screen</code> 裡，先按 <kbd>Ctrl+A</kbd>，放開後按 <kbd>:</kbd> 開啟命令列，輸入 <code>quit</code> 再按 <kbd>Enter</kbd>。已暫離時，可以從 Mac 的終端機執行 <code>screen -S pic18 -X quit</code>。終止後便會釋放序列埠。要再連線，重新執行上面的 <code>screen -S pic18 … 9600</code>。<a href="https://www.gnu.org/software/screen/manual/screen.html">GNU Screen 手冊</a></p>
+
+        <h3 id="screen-options" lang="en"><a class="heading-link" href="#screen-options">Common Options</a></h3>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="screen 常用選項">
+          <table>
+            <thead><tr><th scope="col">選項</th><th scope="col">用途</th><th scope="col">寫法</th></tr></thead>
+            <tbody>
+              <tr><th scope="row"><code>-ls</code></th><td>列出現有的工作階段。</td><td><code>screen -ls</code></td></tr>
+              <tr><th scope="row"><code>-S</code></th><td>建立時命名，或搭配 <code>-X</code> 選定要操作的工作階段。</td><td><code>screen -S pic18 /dev/cu.usbserial-XXXX 9600</code></td></tr>
+              <tr><th scope="row"><code>-r</code></th><td>接回已暫離的工作階段。後面填名稱或編號。</td><td><code>screen -r pic18</code></td></tr>
+              <tr><th scope="row"><code>-d -r</code></th><td>把已接上的工作階段移到目前的終端機。</td><td><code>screen -d -r pic18</code></td></tr>
+              <tr><th scope="row"><code>-X</code></th><td>從外部對工作階段執行指令。<code>quit</code> 會結束它。</td><td><code>screen -S pic18 -X quit</code></td></tr>
+              <tr><th scope="row"><code>-L</code></th><td>開啟輸出記錄。第一個視窗的預設檔名是 <code>screenlog.0</code>。</td><td><code>screen -L -S pic18 /dev/cu.usbserial-XXXX 9600</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
